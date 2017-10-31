@@ -1,0 +1,12 @@
+
+
+
+Working with Verilog-A Models in MAPP
+-------------------------------------
+VAPP               - General information about the Berkeley Verilog-A Parser
+                     and Processor (VAPP)
+
+VAPPquickstart     - quick start guide for the Berkeley Verilog-A Parser and
+                     Processor (VAPP)
+
+va2modspec         - how to use the main user-interface of VAPP
