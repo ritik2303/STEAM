@@ -1,0 +1,4 @@
+[submodule "STEAM/polynomial-interpolation"]
+	path = STEAM/polynomial-interpolation
+	url = git@ssh.github.com:architgupta93/polynomial-interpolation
+	branch = master
