@@ -2,3 +2,6 @@
 	path = STEAM/polynomial-interpolation
 	url = git@ssh.github.com:architgupta93/polynomial-interpolation
 	branch = master
+[submodule "STEAM/src/device-models"]
+	path = STEAM/src/device-models
+	url = git@github.com:architgupta93/device-models
