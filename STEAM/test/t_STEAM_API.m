@@ -1,9 +1,9 @@
 fprintf(2, 'Testing STEAM API... \n');
 
 % Transistor model parameters
-m_handle = @bsim4;
-model_id = 'VA_BSIM4_NMOS';
-model    = MOS5TModel2D(m_handle, model_identifier);
+m_handle = @bsim3;
+model_id = 'VA_BSIM3_NMOS';
+model    = MOS5TModel2D(m_handle, model_id);
 
 % STEAM (discretization/interpolation) parameters
 d_method = 'c';

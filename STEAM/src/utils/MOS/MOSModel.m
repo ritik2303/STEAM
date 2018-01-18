@@ -13,7 +13,7 @@ classdef MOSModel < ModSpecModel
 
     methods (Access = public)
         function mod = MOSModel(m_handle, model_identifier)
-            base_model = set_MOSFET_parms(m_handle(model_identifier), model_identifier);
+            base_model = setMOSFETParms(m_handle(model_identifier), model_identifier);
             mod = mod@ModSpecModel(base_model);
             mod.base_model = base_model;
         end
