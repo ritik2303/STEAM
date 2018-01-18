@@ -1,1 +1,15 @@
 /.project
+Generate_help.sh                 
+MAPP-*-release-*
+MAPP-locallinks-installation     
+Makefile
+autom4te.cache/                  
+config.log  
+config.status                    
+configure   
+help/help_MAPP.txt.in            
+locallinks-are-current           
+setuppaths_MAPP.m                
+start_MAPP.m                     
+
+*.swp
