@@ -23,8 +23,8 @@ steam_model = STEAM(model, i_method, d_method, d_order, d_bounds);
 
 % Draw a comparison between the original model and the STEAM generated model to
 % see the differences between the two
-fprintf(2, 'Testing STEAM generated model against original!')
+fprintf(2, 'Testing STEAM generated model against original!\n')
 n_test_pts     = 500;
-n_dims         = cMOD.n_in_dims;
+n_dims         = steam_model.n_in_dims;
 [~, ~, er_plt] = compareIObjs(n_test_pts, d_bounds, model, steam_model, 'BLI');
 compareIDers(n_test_pts, d_bounds, model, steam_model, 'BLI');
