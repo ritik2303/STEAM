@@ -162,6 +162,8 @@ DAEAPI="DAEAPI-MATLAB"
 LOCALDAEAPI="DAEAPI"
 DOCUMENTATION="Documentation"
 A1oDAEAPI="A1oDAEAPI-MATLAB"
+STEAM="STEAM"
+PPI="STEAM/polynomial-interpolation/matlab"
 LOCALA1oDAEAPI="Analyses1-on-DAEAPI"
 MAPPTESTDATABASE="$(pwd)/$LOCALA1oDAEAPI/test-data"
 
@@ -170,7 +172,6 @@ AC_SUBST(BRANCHNAME, $BRANCHNAME)
 AC_SUBST(CYGWINPREFIX, $CYGWINPREFIX)
 AC_SUBST(MAPPLOCALLINKSDIR, $with_MAPPlocalLinksDir)
 AC_SUBST(VVIMPLEMENTATION, $with_VVimplementation)
-#AC_SUBST(MAPPINSTALLDIR, $THE_PREFIX)
 AC_SUBST(VECVALDER, $VECVALDER)
 AC_SUBST(UTILS, $UTILS)
 AC_SUBST(MODSPEC, $MODSPEC)
@@ -194,12 +195,7 @@ AC_SUBST(VAPP, $VAPP)
 AC_SUBST(MAPPTOP, `pwd`)
 
 dnl read <each file below>.in and write <each file below>
-AC_OUTPUT(Makefile setuppaths_MAPP.m start_MAPP.m Generate_help.sh
-          vecvalder/vv4/vv4-tests/create_vv4_models_for_test_vv4_MVS_9_stage_ring_oscillator_transient.py
-          vecvalder/vv4/vv4-tests/test_vv4_MVS_9_stage_ring_oscillator_transient.m
-          vecvalder/vv4/vv4-tests/check_for_vv4_python_dependencies.m
-          help/help_MAPP.txt Analyses1-on-DAEAPI/test-scripts/MAPPtest/MAPPtest.m)
-#AC_OUTPUT(Makefile setuppaths_MAPP.m start_MAPP.m Generate_help.sh help/help_MAPP.txt)
+AC_OUTPUT(Makefile setuppaths_MAPP.m start_MAPP.m Generate_help.sh help/help_MAPP.txt)
 
 echo "--------------------------------------------------------------------"
 echo "$THEVERSION configured."

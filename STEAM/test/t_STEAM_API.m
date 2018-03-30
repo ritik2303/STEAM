@@ -35,5 +35,5 @@ steam_model = STEAM(model, i_method, d_method, d_order, d_bounds);
 fprintf(2, 'Testing STEAM generated model against original!\n')
 n_test_pts     = 500;
 n_dims         = steam_model.n_in_dims;
-[~, ~, er_plt] = compareIObjs(n_test_pts, d_bounds, model, steam_model, 'BLI');
-compareIDers(n_test_pts, d_bounds, model, steam_model, 'BLI');
+[~, ~, er_plt] = compareIObjs(n_test_pts, d_bounds, model, steam_model, 'STEAM');
+compareIDers(n_test_pts, d_bounds, model, steam_model, 'STEAM');

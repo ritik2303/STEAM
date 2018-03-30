@@ -12,4 +12,5 @@ locallinks-are-current
 setuppaths_MAPP.m                
 start_MAPP.m                     
 
+help/help_MAPP.txt
 *.swp
