@@ -97,7 +97,10 @@ function [figh, onames, colindex] = transientPlot(DAE, tpts, vals, ...
 %          'figh' or 'fighandle'
 %          'legends'
 %          'clrindex'
-%          'PLOTvarargin'
+%          'PLOTvarargin' - Documentation is WRONG, should be plotvarargin
+%   MORE IMPORTANTLY: In the second calling syntax, you HAVE to provide a
+%   value for figh, otherwise, it is set to [], and nothing is returned
+%   basically.
 %
 % - optionVal: corresponding value for optionName, see the first calling syntax
 %              for the description of available values for each optionName.
@@ -173,7 +176,8 @@ function [figh, onames, colindex] = transientPlot(DAE, tpts, vals, ...
 %% reserved.                                                                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    if nargin >= 5 && ischar(varargin{1}) % second calling syntax with 'optionName'
+ls
+if nargin >= 5 && ischar(varargin{1}) % second calling syntax with 'optionName'
 	    % defaults
 		time_units = '';
 		stateoutputs = [];
@@ -205,9 +209,18 @@ function [figh, onames, colindex] = transientPlot(DAE, tpts, vals, ...
 			elseif strcmp(optionName, 'plotvarargin')
 				PLOTvarargin = optionVal;
 			end
-		end
+        end
 
+        if (isempty(figh))  % Value was not supplied. Cannot do this 
+                            % beforehand as it will open a new figure 
+                            % unnecessarily even if the value is supplied
+           figh = figure;
+        end
+        
 		% post-process stateoutputs to get onames
+                % This entire thing is very messy. When the DAE has a field called outputs (which is by default setup to
+                % include all the unknowns, why are we poking around and fiddling with the DAE unknowns explicitly. We
+                % should only be touching the DAE outputs and working with C and D matrices. - AG
         if 0 == sum(size(stateoutputs))
             % plot DAE outputs
             C = feval(DAE.C, DAE);
@@ -215,14 +228,16 @@ function [figh, onames, colindex] = transientPlot(DAE, tpts, vals, ...
             onames = feval(DAE.outputnames, DAE);
         else % plot state outputs specified in stateoutputs
             % set up C, D, onames
+            dae_C = DAE.C(DAE);
+            dae_D = DAE.D(DAE);
             ninps = feval(DAE.ninputs, DAE);
             nunks = feval(DAE.nunks, DAE);
             varidxs = feval(stateoutputs.OutputIndices, stateoutputs);
 
-            D = zeros(length(varidxs), ninps);
-            C = sparse([]); C(length(varidxs), nunks)=0;
+            D = dae_D;
+            C = sparse(length(varidxs), nunks);
             for i=1:length(varidxs)
-                C(i,varidxs(i)) = 1; 
+                C(i,:) = dae_C(varidxs(i),:); 
             end
             onames = feval(stateoutputs.OutputNames, stateoutputs);
         end
@@ -237,15 +252,17 @@ function [figh, onames, colindex] = transientPlot(DAE, tpts, vals, ...
 			onames = feval(DAE.outputnames, DAE);
 		else % plot state outputs specified in stateoutputs
 			% set up C, D, onames
+                        dae_C = DAE.C(DAE);
+                        dae_D = DAE.D(DAE);
 			ninps = feval(DAE.ninputs, DAE);
 			nunks = feval(DAE.nunks, DAE);
-			D = zeros(nunks, ninps);
 
 			varidxs = feval(stateoutputs.OutputIndices, stateoutputs);
-			C = sparse([]); C(length(varidxs), nunks)=0;
+			C = sparse(length(varidxs), nunks);
 			for i=1:length(varidxs)
-				C(i,varidxs(i)) = 1;
+				C(i,:) = dae_C(varidxs(i),:);
 			end
+			D = zeros(length(varidxs), ninps);
 			onames = feval(stateoutputs.OutputNames, stateoutputs);
 		end
 

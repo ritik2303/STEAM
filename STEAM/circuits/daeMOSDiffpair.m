@@ -105,7 +105,7 @@ function [dae, outputs, sim_args] = daeMOSDiffpair(varargin)
 
     % DC Sweep Arguments 
     sim_args.v_start = 0;
-    sim_args.v_step = 0.01;
+    sim_args.v_step = 0.2;
     sim_args.v_stop = VDD;
 
     % AC Analysis Arguments

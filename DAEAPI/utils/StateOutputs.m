@@ -54,10 +54,10 @@ function OutputObj = StateOutputs(DAE)
 
 % Data
 %
-OutputObj.alloutputnames = feval(DAE.unknames,DAE); % cell list
+OutputObj.alloutputnames = feval(DAE.outputnames,DAE); % cell list
 %
 OutputObj.outputnames = OutputObj.alloutputnames;
-OutputObj.numoutputs = feval(DAE.nunks, DAE);
+OutputObj.numoutputs = feval(DAE.noutputs, DAE);
 OutputObj.outputindices = 1:OutputObj.numoutputs;
 OutputObj.DAE = DAE; % this should really be a pointer
 %

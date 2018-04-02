@@ -65,7 +65,7 @@ function [dae, outputs, simArgs] = daeMOSInverter(varargin)
 
         % DC Analysis Arguments
         simArgs.v_start = 0;
-        simArgs.v_step = 0.01;
+        simArgs.v_step = 0.2;
         simArgs.v_stop = VDD;
 
         % Transient Arguments
@@ -83,7 +83,7 @@ function [dae, outputs, simArgs] = daeMOSInverter(varargin)
         % DC Analysis Arguments
         %simArgs.v_start = 0.85*VDD;
         simArgs.v_start = VDD;
-        simArgs.v_step = -0.01;
+        simArgs.v_step = -0.2;
         simArgs.v_stop = 0;
     else
         fprintf(2, 'Circuit parameters not found for the given MOS model\n');
