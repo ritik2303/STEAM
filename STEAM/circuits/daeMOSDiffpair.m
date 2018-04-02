@@ -32,8 +32,8 @@ function [dae, outputs, sim_args] = daeMOSDiffpair(varargin)
     CRe = 1e-6;
 
     %vdd_elem
-    vdd_elem.name = 'Vdd';
-    vdd_elem.model = vsrcModSpec('Vdd'); % get the ModSpec model
+    vdd_elem.name = 'vdd';
+    vdd_elem.model = vsrcModSpec('vdd'); % get the ModSpec model
     vdd_elem.nodes = {'vdd', 'gnd'}; % positive and negative nodes of the vsrc
     vdd_elem.parms = {};
 
@@ -181,7 +181,7 @@ function [dae, outputs, sim_args] = daeMOSDiffpair(varargin)
     % Setting up transient inputs
     dae = dae.set_utransient('vin:::E', inFunc, in_args, dae);
     dae = dae.set_utransient('vcm:::E', constFunc, vcm_args, dae);
-    dae = dae.set_utransient('Vdd:::E', constFunc, vdd_args, dae);
+    dae = dae.set_utransient('vdd:::E', constFunc, vdd_args, dae);
     dae = dae.set_utransient('IS:::I', constFunc, is_args, dae);
 
     % Setting up DC inputs
@@ -203,7 +203,7 @@ function [dae, outputs, sim_args] = daeMOSDiffpair(varargin)
             % Generating an initial guess using voltage stepping
             n_vdd_steps = dae.nunks(dae);
             for vdd_val = [ linspace( 0.5*VDD, VDD, n_vdd_steps)];
-                stepping_dae = dae.set_uQSS('Vdd:::E', vdd_val, dae); 
+                stepping_dae = dae.set_uQSS('vdd:::E', vdd_val, dae); 
                 op_pt = op(stepping_dae, initguess);
                 initguess = op_pt.getSolution(op_pt);
             end

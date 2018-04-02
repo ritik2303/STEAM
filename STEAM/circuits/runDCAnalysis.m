@@ -41,19 +41,19 @@ function [speedup, estimation_error, base_solution] = runDCAnalysis(...
     end
     
     % Running steam circuit (Maybe be tabulated/2-dimensional etc.)
-    %{
     [steam_dae, steam_outs] = daeMOSDiffpair(model, parm_string, ...
         subCkt, method_spl);
     [bli_dae, bli_outs] = daeMOSDiffpair(model, parm_string, subCkt, method_bli);
     [base_dae, base_outs, simArgs] = daeMOSDiffpair(model, parm_string, subCkt);
     daeIdentifier = 'diffpair';
-    %}
 
+    %{
     [steam_dae, steam_outs] = daeMOSInverter(model, parm_string, ...
         subCkt, method_spl);
     [bli_dae, bli_outs] = daeMOSInverter(model, parm_string, subCkt, method_bli);
     [base_dae, base_outs, simArgs] = daeMOSInverter(model, parm_string, subCkt);
     daeIdentifier = 'inverter';
+    %}
 
     v2struct(simArgs);
     dae_inputs = base_dae.uQSS(base_dae);
@@ -64,7 +64,6 @@ function [speedup, estimation_error, base_solution] = runDCAnalysis(...
 
     % clear functions;
     % Running DC sweep on the tabulated model from STEAM
-    xinit = randn(steam_dae.nunks(steam_dae), 1);
     tic;
         steamSweep = dcsweep(steam_dae, xinit, 'vin:::E', v_start:v_step:v_stop, vdd_str, ...
             vdd_step_range);
