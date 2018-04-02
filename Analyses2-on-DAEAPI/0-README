@@ -1,0 +1,10 @@
+Quickstart:
+	- autoconf
+	- ./configure [--prefix=/where/to/install/Analyses2-on-DAEAPI]
+		[--with-DAEAPIinstallDir=/where/DAEAPI/is/installed]
+		[--with-A1oDAEAPIinstallDir=/where/Analyses1-on-DAEAPI/is/installed]
+		# defaults are under $HOME/local/pkgs/
+	- make
+	- make install
+	- follow the instructions at the end of make install to test
+	  - make installmsg to see the instructions again
