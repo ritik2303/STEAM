@@ -203,7 +203,7 @@ function DAE = MNA_EqnEngine(uniqIDstr, circuitdata) % DAEAPIv6.2+delta
     DAE = DAEAPI_input_add_ons(DAE); %
 % version, help string, ID, store circuitdata: 
     DAE.version = 'DAEAPIv6.2';
-    DAE.Usage = help('MNA_EqnEngine');
+    DAE.Usage = 'help MNA_EqnEngine';
     if nargin < 1 || nargin > 2
         fprintf(2, 'Usage: DAE = MNA_EqnEngine(uniqIDstr, circuitdata)\n or\nDAE = MNA_EqnEngine(circuitdata)');
     elseif 1 == nargin
@@ -273,7 +273,7 @@ function DAE = MNA_EqnEngine(uniqIDstr, circuitdata) % DAEAPIv6.2+delta
         % TEMP DEBUG
         %fprintf(1, 'MNA_EqnEngine debug: setparms for %s about to be called.\n', elname);
         if ~isempty(elParms)
-            elModel_w_updated_parms = feval(elModel.setparms, elParms, elModel);
+            elModel_w_updated_parms = elModel.setparms(elParms, elModel);
             DAE.circuitdata.elements{i}.model = elModel_w_updated_parms;
         else
             DAE.circuitdata.elements{i}.model = elModel;
@@ -294,7 +294,7 @@ function DAE = MNA_EqnEngine(uniqIDstr, circuitdata) % DAEAPIv6.2+delta
         %    DAE.circuitdata.elements{i}.internal_unk_indices_into_x
 
         %% look through the device's nodes, allocate node voltages in x, and make links to x vector unknowns
-        nodenames_internal = feval(elModel.NIL.NodeNames, elModel);
+        nodenames_internal = elModel.NIL.NodeNames(elModel);
         if length(elNodes) ~= length(nodenames_internal)
             error(sprintf('length of device %s''s internal node list different from that of its external node connections', ...
                 elname));
@@ -314,7 +314,7 @@ function DAE = MNA_EqnEngine(uniqIDstr, circuitdata) % DAEAPIv6.2+delta
         end
 
         % set up the link to the x vector for the device's reference node
-        refnode = feval(elModel.NIL.RefNodeName, elModel);
+        refnode = elModel.NIL.RefNodeName(elModel);
         refnodeidx_internal = find(strcmp(refnode, nodenames_internal));
         if 1 ~= length(refnodeidx_internal)
             error(sprintf('reference node %s for device %s not found exactly once amongst device''s node list', refnode, elname));
@@ -332,10 +332,10 @@ function DAE = MNA_EqnEngine(uniqIDstr, circuitdata) % DAEAPIv6.2+delta
         % subtract this from other node values to find branch voltages
 
         %% for vecX: look through otherIOs, act depending on type: 'v' or 'i'
-        ioNames = feval(elModel.IOnames, elModel);
-        ioTypes = feval(elModel.NIL.IOtypes, elModel);
-        ioNodeNames = feval(elModel.NIL.IOnodeNames, elModel);
-        otherIOnames = feval(elModel.OtherIONames, elModel);
+        ioNames = elModel.IOnames(elModel);
+        ioTypes = elModel.NIL.IOtypes(elModel);
+        ioNodeNames = elModel.NIL.IOnodeNames(elModel);
+        otherIOnames = elModel.OtherIONames(elModel);
         for oio = otherIOnames
             idx_in_IOs = find(strcmp(oio, ioNames));
             if 1 ~= length(idx_in_IOs)
@@ -375,7 +375,7 @@ function DAE = MNA_EqnEngine(uniqIDstr, circuitdata) % DAEAPIv6.2+delta
         end
 
         %% for vecY: add unknowns (and links) for the device's internal unknowns
-        intUnkNames = feval(elModel.InternalUnkNames, elModel);
+        intUnkNames = elModel.InternalUnkNames(elModel);
         if length(intUnkNames) > 0
             intUnkNames = strcat(prefix, intUnkNames);
             unk_names = {unk_names{:}, intUnkNames{:}};
@@ -419,7 +419,7 @@ function DAE = MNA_EqnEngine(uniqIDstr, circuitdata) % DAEAPIv6.2+delta
         DAE.circuitdata.elements{i}.refnodeKCL_index_into_fq = DAE.circuitdata.elements{i}.refnode_index_into_x;
 
         %% look through explicitOutputs and act depending on whether branch voltage or current
-        eoNames = feval(elModel.ExplicitOutputNames, elModel);
+        eoNames = elModel.ExplicitOutputNames(elModel);
         neoi = 0; % number of 'i' type explicit outputs
         neov = 0; % number of 'v' type explicit outputs
         for eo = eoNames
@@ -468,7 +468,7 @@ function DAE = MNA_EqnEngine(uniqIDstr, circuitdata) % DAEAPIv6.2+delta
         %DAE.circuitdata.elements{i}.neov = neov;
 
         %% look through ImplicitEquations and add equations, store indices for the equations in ckt f/q
-        ieNames = feval(elModel.ImplicitEquationNames, elModel);
+        ieNames = elModel.ImplicitEquationNames(elModel);
         nIEs = length(ieNames);
         if nIEs > 0
             DAE.circuitdata.elements{i}.ImplicitEqn_indices_into_fq = (n_eqns+1):(n_eqns+nIEs);
@@ -484,7 +484,7 @@ function DAE = MNA_EqnEngine(uniqIDstr, circuitdata) % DAEAPIv6.2+delta
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % set up circuit inputs and related indices for access
         %% iterate through device's uNames
-        uNames = feval(elModel.uNames, elModel);
+        uNames = elModel.uNames(elModel);
         nUs = length(uNames);
         if nUs > 0
             tmp = strcat(prefix, uNames);
@@ -504,13 +504,13 @@ function DAE = MNA_EqnEngine(uniqIDstr, circuitdata) % DAEAPIv6.2+delta
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % set up all circuit parameters and access functions into the devices
         %% iterate through device's uNames
-        pNames = feval(elModel.parmnames, elModel);
+        pNames = elModel.parmnames(elModel);
         nPs = length(pNames);
         if nPs > 0
             tmp = strcat(prefix, pNames);
             [parm_names{(n_parms+1):(n_parms+nPs)}] = tmp{:};
             n_parms = n_parms + nPs;
-            device_parmdefaults = feval(elModel.parmdefaults, elModel);
+            device_parmdefaults = elModel.parmdefaults(elModel);
             parm_default_vals = {parm_default_vals{:}, device_parmdefaults{:}};
         else
             device_parmdefaults = {};
@@ -531,9 +531,9 @@ function DAE = MNA_EqnEngine(uniqIDstr, circuitdata) % DAEAPIv6.2+delta
         elname = el.name;
 
         % begin set up A_X, A_fX
-        otherIOnames = feval(elModel.OtherIONames, elModel);
-        ioNames = feval(elModel.IOnames, elModel);
-        ioTypes = feval(elModel.NIL.IOtypes, elModel);
+        otherIOnames = elModel.OtherIONames(elModel);
+        ioNames = elModel.IOnames(elModel);
+        ioTypes = elModel.NIL.IOtypes(elModel);
         A_X = sparse(length(otherIOnames), n_unks);
         A_fX = sparse(n_eqns, length(otherIOnames));
         refnode_idx = el.refnode_index_into_x;
@@ -571,7 +571,7 @@ function DAE = MNA_EqnEngine(uniqIDstr, circuitdata) % DAEAPIv6.2+delta
         % end set up A_X, A_fX
 
         % begin set up A_Y
-        intUnkNames = feval(elModel.InternalUnkNames, elModel);
+        intUnkNames = elModel.InternalUnkNames(elModel);
         A_Y = sparse(length(intUnkNames), n_unks);
         for idx2 = 1:length(intUnkNames)
             A_Y(idx2, el.intunk_indices_into_x(idx2)) = 1;
@@ -589,7 +589,7 @@ function DAE = MNA_EqnEngine(uniqIDstr, circuitdata) % DAEAPIv6.2+delta
         % end set up A_Xlim
 
         % begin set up A_U
-        uNames = feval(elModel.uNames, elModel);
+        uNames = elModel.uNames(elModel);
         A_U = sparse(length(uNames), n_inputs);
         for idx2 = 1:length(uNames)
             A_U(idx2, el.u_indices_into_cktu(idx2)) = 1;
@@ -598,7 +598,7 @@ function DAE = MNA_EqnEngine(uniqIDstr, circuitdata) % DAEAPIv6.2+delta
 
         % begin set up A_Zi, A_Zv and A_Zve
         refnodeKCL_index_into_fq = el.refnodeKCL_index_into_fq;
-        eoNames = feval(elModel.ExplicitOutputNames, elModel);
+        eoNames = elModel.ExplicitOutputNames(elModel);
         A_Zi = sparse(n_eqns, length(eoNames)); 
         A_Zv = sparse(n_eqns, length(eoNames)); 
         A_Zve = sparse(length(eoNames), n_unks); 
@@ -642,7 +642,7 @@ function DAE = MNA_EqnEngine(uniqIDstr, circuitdata) % DAEAPIv6.2+delta
         % end set up A_Zi, A_Zv and A_Zve
 
         % begin set up A_W
-        ieNames = feval(elModel.ImplicitEquationNames, elModel);
+        ieNames = elModel.ImplicitEquationNames(elModel);
         A_W = sparse(n_eqns, length(ieNames));
         for idx2 = 1:length(ieNames)
             % the index of the equation is el.ImplicitEqn_indices_into_fq(idx2)
@@ -665,7 +665,7 @@ function DAE = MNA_EqnEngine(uniqIDstr, circuitdata) % DAEAPIv6.2+delta
     end % 2nd pass through all devices
 
     % a small 3rd pass to set up x_to_xlim_matrix, can be integrated into 2nd pass, but efficiency is affected only trivially
-    x_to_xlim_matrix = zeros(n_limitedvars, n_unks);
+    x_to_xlim_matrix = sparse(n_limitedvars, n_unks);
     for i = 1:length(DAE.circuitdata.elements);
         el = DAE.circuitdata.elements{i};
         elModel = el.model; % there is a separate one for each device
@@ -785,7 +785,7 @@ function DAE = MNA_EqnEngine(uniqIDstr, circuitdata) % DAEAPIv6.2+delta
     DAE.support_initlimiting = 1;
 % QSS initial guess support
     DAE.NRinitGuess = @NRinitGuess;
-    DAE.QSSinitGuess = @(u, DAEarg) zeros(feval(DAEarg.nunks, DAEarg),1); % default is zeros
+    DAE.QSSinitGuess = @(u, DAEarg) sparse(feval(DAEarg.nunks, DAEarg),1); % default is sparse
     %
 % NR limiting support
      DAE.NRlimiting = @NRlimiting;
@@ -829,7 +829,7 @@ function DAE = MNA_EqnEngine(uniqIDstr, circuitdata) % DAEAPIv6.2+delta
         elModel = el.model; % there is a separate one for each device
         elname = el.name;
 
-        unames = feval(elModel.uNames, elModel);
+        unames = elModel.uNames(elModel);
         if (length(unames) > 0) && (isfield(el, 'udata'))
             prefix = sprintf('%s%s', elname, DAE.separatorString);
             udata = el.udata; 
@@ -1023,7 +1023,10 @@ function parmvals = newgetparms(firstarg, secondarg)
     end
     for i = 1:length(pnames);
         pname = pnames{i};
-        pidx = find(~cellfun(@isempty, regexp(DAE.parm_names, sprintf('^%s', pname))));
+        %pidx = find(strcmp(pname, DAE.parm_names));
+        pidx = find(~cellfun(@isempty, regexp(DAE.parm_names, sprintf('^%s$', pname))));
+        % MINOR BUG FIX -AG: Same bug fix as in setparms. What to do with a
+        % DAE that has 2 parameters w and w0
         if (length(pidx) < 1)
             fprintf(1, 'parameter starting with %s not found in DAE.\n', pname);
             outDAE = DAE;
@@ -1108,7 +1111,11 @@ function outDAE = newsetparms(firstarg, secondarg, thirdarg)
 
     for i = 1:length(pnames);
         pname = pnames{i};
-        pidx = find(~cellfun(@isempty, regexp(DAE.parm_names, sprintf('^%s', pname))));
+        %pidx = find(strcmp(pname, DAE.parm_names));
+        pidx = find(~cellfun(@isempty, regexp(DAE.parm_names, sprintf('^%s$', pname))));
+        % MINOR BUG FIX -AG: if you have a parameter called w and another
+        % called w0, without exactly matching the regexp, there is no way
+        % to set the parameter w in the DAE.
         if (length(pidx) < 1)
             fprintf(1, 'parameter starting with %s not found in DAE.\n', pname);
             outDAE = DAE;
@@ -1184,11 +1191,11 @@ function [fqout, dfqout] = fq(x, xlim, u, DAE, f_or_q, x_or_u_or_xlim)
         derivs_wanted = 0;
     end
 
-    % initialize fqout to zeros: POTENTIAL VECVALDER PROBLEM
-    fqout = zeros(DAE.n_eqns,DAE.n_unks)*x; % HACK to make fqout the right-sized vecvalder 
+    % initialize fqout to sparse: POTENTIAL VECVALDER PROBLEM
+    fqout = sparse(DAE.n_eqns,DAE.n_unks)*x; % HACK to make fqout the right-sized vecvalder 
                         % if either x or u is a vecvalder - seems to work
     if DAE.n_inputs > 0 && length(u) > 0
-        fqout = fqout + zeros(DAE.n_eqns,DAE.n_inputs)*u;
+        fqout = fqout + sparse(DAE.n_eqns,DAE.n_inputs)*u;
     end
     fqout = sparse(fqout);
 
@@ -1248,51 +1255,51 @@ function [fqout, dfqout] = fq(x, xlim, u, DAE, f_or_q, x_or_u_or_xlim)
          % recall: vecZ = qedot(vecX,vecY,parms) + fe(vecX,vecY,parms,u(t)) %(e denotes explicit)
         if 1 == eff
             if 1 == elModel.support_initlimiting
-                vecZ = feval(elModel.fe, vecX, vecY, vecLim, vecU, elModel); % f: size l = length(ExplicitOutputs)
+                vecZ = elModel.fe(vecX, vecY, vecLim, vecU, elModel); % f: size l = length(ExplicitOutputs)
             else
-                vecZ = feval(elModel.fe, vecX, vecY, vecU, elModel); % f: size l = length(ExplicitOutputs)
+                vecZ = elModel.fe(vecX, vecY, vecU, elModel); % f: size l = length(ExplicitOutputs)
             end
             if 1 == derivs_wanted
                 if 1 == ddx
                     if 1 == elModel.support_initlimiting
-                        dvecZ_dvecX = feval(elModel.dfe_dvecX, vecX, vecY, vecLim, vecU, elModel);
-                        dvecZ_dvecY = feval(elModel.dfe_dvecY, vecX, vecY, vecLim, vecU, elModel);
+                        dvecZ_dvecX = elModel.dfe_dvecX(vecX, vecY, vecLim, vecU, elModel);
+                        dvecZ_dvecY = elModel.dfe_dvecY(vecX, vecY, vecLim, vecU, elModel);
                     else
-                        dvecZ_dvecX = feval(elModel.dfe_dvecX, vecX, vecY, vecU, elModel);
-                        dvecZ_dvecY = feval(elModel.dfe_dvecY, vecX, vecY, vecU, elModel);
+                        dvecZ_dvecX = elModel.dfe_dvecX(vecX, vecY, vecU, elModel);
+                        dvecZ_dvecY = elModel.dfe_dvecY(vecX, vecY, vecU, elModel);
                     end
                 elseif 0 == ddx % ddu
                     if 1 == elModel.support_initlimiting
-                        dvecZ_dvecU = feval(elModel.dfe_dvecU, vecX, vecY, vecLim, vecU, elModel);
+                        dvecZ_dvecU = elModel.dfe_dvecU(vecX, vecY, vecLim, vecU, elModel);
                     else
-                        dvecZ_dvecU = feval(elModel.dfe_dvecU, vecX, vecY, vecU, elModel);
+                        dvecZ_dvecU = elModel.dfe_dvecU(vecX, vecY, vecU, elModel);
                     end
                 else % ddxlim
                     if 1 == elModel.support_initlimiting
-                        dvecZ_dvecXlim = feval(elModel.dfe_dvecLim, vecX, vecY, vecLim, vecU, elModel);
+                        dvecZ_dvecXlim = elModel.dfe_dvecLim(vecX, vecY, vecLim, vecU, elModel);
                     end
                 end
             end
         else
             if 1 == elModel.support_initlimiting
-                vecZ = feval(elModel.qe, vecX, vecY, vecLim, elModel); % q: size l = length(ExplicitOutputs)
+                vecZ = elModel.qe(vecX, vecY, vecLim, elModel); % q: size l = length(ExplicitOutputs)
             else
-                vecZ = feval(elModel.qe, vecX, vecY, elModel); % q: size l = length(ExplicitOutputs)
+                vecZ = elModel.qe(vecX, vecY, elModel); % q: size l = length(ExplicitOutputs)
             end
             if 1 == derivs_wanted
                 if 1 == ddx
                     if 1 == elModel.support_initlimiting
-                        dvecZ_dvecX = feval(elModel.dqe_dvecX, vecX, vecY, vecLim, elModel);
-                        dvecZ_dvecY = feval(elModel.dqe_dvecY, vecX, vecY, vecLim, elModel);
+                        dvecZ_dvecX = elModel.dqe_dvecX(vecX, vecY, vecLim, elModel);
+                        dvecZ_dvecY = elModel.dqe_dvecY(vecX, vecY, vecLim, elModel);
                     else
-                        dvecZ_dvecX = feval(elModel.dqe_dvecX, vecX, vecY, elModel);
-                        dvecZ_dvecY = feval(elModel.dqe_dvecY, vecX, vecY, elModel);
+                        dvecZ_dvecX = elModel.dqe_dvecX(vecX, vecY, elModel);
+                        dvecZ_dvecY = elModel.dqe_dvecY(vecX, vecY, elModel);
                     end
                 elseif 0 == ddx % ddu
                     dvecZ_dvecU = sparse(length(vecZ), DAE.n_inputs);
                 else % ddxlim
                     if 1 == elModel.support_initlimiting
-                        dvecZ_dvecXlim = feval(elModel.dqe_dvecLim, vecX, vecY, vecLim, elModel);
+                        dvecZ_dvecXlim = elModel.dqe_dvecLim(vecX, vecY, vecLim, elModel);
                     end
                 end
             end
@@ -1356,19 +1363,19 @@ function [fqout, dfqout] = fq(x, xlim, u, DAE, f_or_q, x_or_u_or_xlim)
         % compute vecW (device's ImplicitEquations): call fi or qi
         % recall: vecW = qidot(vecX,vecY,parms) + fi(vecX,vecY,parms,u(t)) = 0 % (i denotes implicit)
 
-        nMlpm = length(feval(elModel.ImplicitEquationNames, elModel));
+        nMlpm = length(elModel.ImplicitEquationNames(elModel));
         if nMlpm > 0
             if 1 == eff
                 if 1 == elModel.support_initlimiting
-                    vecW = feval(elModel.fi, vecX, vecY, vecLim, vecU, elModel);
+                    vecW = elModel.fi(vecX, vecY, vecLim, vecU, elModel);
                 else
-                    vecW = feval(elModel.fi, vecX, vecY, vecU, elModel);
+                    vecW = elModel.fi(vecX, vecY, vecU, elModel);
                 end
             else
                 if 1 == elModel.support_initlimiting
-                    vecW = feval(elModel.qi, vecX, vecY, vecLim, elModel);
+                    vecW = elModel.qi(vecX, vecY, vecLim, elModel);
                 else
-                    vecW = feval(elModel.qi, vecX, vecY, elModel);
+                    vecW = elModel.qi(vecX, vecY, elModel);
                 end
             end
 
@@ -1380,17 +1387,17 @@ function [fqout, dfqout] = fq(x, xlim, u, DAE, f_or_q, x_or_u_or_xlim)
                 if 1 == eff
                     if 1 == ddx
                         if 1 == elModel.support_initlimiting
-                            dvecW_dvecX = feval(elModel.dfi_dvecX, vecX, vecY, vecLim, vecU, elModel);
-                            dvecW_dvecY = feval(elModel.dfi_dvecY, vecX, vecY, vecLim, vecU, elModel);
+                            dvecW_dvecX = elModel.dfi_dvecX(vecX, vecY, vecLim, vecU, elModel);
+                            dvecW_dvecY = elModel.dfi_dvecY(vecX, vecY, vecLim, vecU, elModel);
                         else
-                            dvecW_dvecX = feval(elModel.dfi_dvecX, vecX, vecY, vecU, elModel);
-                            dvecW_dvecY = feval(elModel.dfi_dvecY, vecX, vecY, vecU, elModel);
+                            dvecW_dvecX = elModel.dfi_dvecX(vecX, vecY, vecU, elModel);
+                            dvecW_dvecY = elModel.dfi_dvecY(vecX, vecY, vecU, elModel);
                         end
                     elseif 0 == ddx % ddu
                         if 1 == elModel.support_initlimiting
-                            dvecW_dvecU = feval(elModel.dfi_dvecU, vecX, vecY, vecLim, vecU, elModel);
+                            dvecW_dvecU = elModel.dfi_dvecU(vecX, vecY, vecLim, vecU, elModel);
                         else
-                            dvecW_dvecU = feval(elModel.dfi_dvecU, vecX, vecY, vecU, elModel);
+                            dvecW_dvecU = elModel.dfi_dvecU(vecX, vecY, vecU, elModel);
                         end
                     else % ddxlim
                         if 1 == elModel.support_initlimiting
@@ -1400,17 +1407,17 @@ function [fqout, dfqout] = fq(x, xlim, u, DAE, f_or_q, x_or_u_or_xlim)
                 else
                     if 1 == ddx
                         if 1 == elModel.support_initlimiting
-                            dvecW_dvecX = feval(elModel.dqi_dvecX, vecX, vecY, vecLim, elModel);
-                            dvecW_dvecY = feval(elModel.dqi_dvecY, vecX, vecY, vecLim, elModel);
+                            dvecW_dvecX = elModel.dqi_dvecX(vecX, vecY, vecLim, elModel);
+                            dvecW_dvecY = elModel.dqi_dvecY(vecX, vecY, vecLim, elModel);
                         else
-                            dvecW_dvecX = feval(elModel.dqi_dvecX, vecX, vecY, elModel);
-                            dvecW_dvecY = feval(elModel.dqi_dvecY, vecX, vecY, elModel);
+                            dvecW_dvecX = elModel.dqi_dvecX(vecX, vecY, elModel);
+                            dvecW_dvecY = elModel.dqi_dvecY(vecX, vecY, elModel);
                         end
                     elseif 0 == ddx % ddu
                         dvecW_dvecU = sparse(nMlpm, DAE.n_inputs);
                     else % ddxlim
                         if 1 == elModel.support_initlimiting
-                            dvecW_dvecLim = feval(elModel.dqi_dvecLim, vecX, vecY, vecLim, elModel);
+                            dvecW_dvecLim = elModel.dqi_dvecLim(vecX, vecY, vecLim, elModel);
                         end
                     end
                 end
@@ -1471,20 +1478,20 @@ function out = fqJ(x, xlim, u, flag, DAE)
     dqdxlim = [];
     dfdu = [];
 
-    % initialize fqout to zeros: POTENTIAL VECVALDER PROBLEM
+    % initialize fqout to sparse: POTENTIAL VECVALDER PROBLEM
     if flag.f == 1
-        fout = zeros(DAE.n_eqns,DAE.n_unks)*x; % HACK to make fqout the right-sized vecvalder 
+        fout = sparse(DAE.n_eqns,DAE.n_unks)*x; % HACK to make fqout the right-sized vecvalder 
     end
     if flag.q == 1
-        qout = zeros(DAE.n_eqns,DAE.n_unks)*x; % HACK to make fqout the right-sized vecvalder 
+        qout = sparse(DAE.n_eqns,DAE.n_unks)*x; % HACK to make fqout the right-sized vecvalder 
     end
     % if either x or u is a vecvalder - seems to work
     if DAE.n_inputs > 0 && length(u) > 0
         if flag.f == 1
-            fout = fout + zeros(DAE.n_eqns,DAE.n_inputs)*u;
+            fout = fout + sparse(DAE.n_eqns,DAE.n_inputs)*u;
         end
         if flag.q == 1
-            qout = qout + zeros(DAE.n_eqns,DAE.n_inputs)*u;
+            qout = qout + sparse(DAE.n_eqns,DAE.n_inputs)*u;
         end
     end
     if flag.f == 1
@@ -1550,7 +1557,7 @@ function out = fqJ(x, xlim, u, flag, DAE)
         elflag.fi = 0;
         elflag.qe = 0;
         elflag.qi = 0;
-        nMlpm = length(feval(elModel.ImplicitEquationNames, elModel));
+        nMlpm = length(elModel.ImplicitEquationNames(elModel));
 
         if flag.f == 1
             elflag.fe = 1;
@@ -1567,9 +1574,9 @@ function out = fqJ(x, xlim, u, flag, DAE)
 
         elflag.J = 1;
         if 1 == elModel.support_initlimiting
-            [fqei, J] = feval(elModel.fqeiJ, vecX, vecY, vecLim, vecU, elflag, elModel);
+            [fqei, J] = elModel.fqeiJ(vecX, vecY, vecLim, vecU, elflag, elModel);
         else
-            [fqei, J] = feval(elModel.fqeiJ, vecX, vecY, vecU, elflag, elModel);
+            [fqei, J] = elModel.fqeiJ(vecX, vecY, vecU, elflag, elModel);
         end
         % [fvecZ, qvecZ, fvecW, qvecW] = feval(elModel.fqeiJ, vecX, vecY, vecLim, vecU, elflag, elModel);
         fvecZ = sparse(fqei.fe);
@@ -1592,55 +1599,49 @@ function out = fqJ(x, xlim, u, flag, DAE)
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         % The following parts are mapping the element output to DAE output.
+        AZi_minus_AZv = el.A_Zi - el.A_Zv;
+        AZv_times_AZve = el.A_Zv*el.A_Zve;
         if flag.f ==1
             fout = fout + el.A_fX * sparse(vecX);
             if ~isempty(fvecZ)
-                fout = fout + el.A_Zi * fvecZ; 
-                fout = fout - el.A_Zv * fvecZ;
+		fout = fout + AZi_minus_AZv * fvecZ;
             end
-            fout = fout + el.A_Zv*el.A_Zve*sparse(x);
+            fout = fout + AZv_times_AZve*x;
         end
 
         if flag.q == 1
             if ~isempty(qvecZ)
-                qout = qout + el.A_Zi * qvecZ;
-                qout = qout - el.A_Zv * qvecZ;
+	        qout = qout + AZi_minus_AZv * qvecZ; 
             end
         end
 
         if flag.dfdx == 1
-            dfdx = dfdx + el.A_fX * el.A_X;
             fdvecZ_dx = fdvecZ_dvecX * el.A_X + fdvecZ_dvecY * el.A_Y;
-            dfdx = dfdx + el.A_Zi * fdvecZ_dx;
-            dfdx = dfdx - el.A_Zv * fdvecZ_dx;
-            dfdx = dfdx + el.A_Zv*el.A_Zve;
+            dfdx = dfdx + el.A_fX * el.A_X + AZi_minus_AZv * fdvecZ_dx ...
+                + AZv_times_AZve;
         end
 
         if flag.dqdx == 1
              qdvecZ_dx = qdvecZ_dvecX * el.A_X + qdvecZ_dvecY * el.A_Y;
-             dqdx = dqdx + el.A_Zi * qdvecZ_dx;
-             dqdx = dqdx - el.A_Zv * qdvecZ_dx;
+             dqdx = dqdx + AZi_minus_AZv * qdvecZ_dx;
         end
 
         if flag.dfdu == 1
             fdvecZ_du = fdvecZ_dvecU * el.A_U;
-            dfdu = dfdu + el.A_Zi * fdvecZ_du;
-            dfdu = dfdu - el.A_Zv * fdvecZ_du;
+            dfdu = dfdu + AZi_minus_AZv * fdvecZ_du;
         end
 
         if flag.dfdxlim == 1
             if 1 == elModel.support_initlimiting
                 fdvecZ_dxlim = fdvecZ_dvecXlim * el.A_Xlim;
-                dfdxlim = dfdxlim + el.A_Zi * fdvecZ_dxlim;
-                dfdxlim = dfdxlim - el.A_Zv * fdvecZ_dxlim;
+                dfdxlim = dfdxlim + AZi_minus_AZv * fdvecZ_dxlim;
             end
         end
 
         if flag.dqdxlim == 1
             if 1 == elModel.support_initlimiting
                 qdvecZ_dxlim = qdvecZ_dvecXlim * el.A_Xlim;
-                dqdxlim = dqdxlim + el.A_Zi * qdvecZ_dxlim;
-                dqdxlim = dqdxlim - el.A_Zv * qdvecZ_dxlim;
+                dqdxlim = dqdxlim + AZi_minus_AZv * qdvecZ_dxlim;
             end
         end
 
@@ -1707,10 +1708,10 @@ function [out, dout] = init_limiting(x, xlimOld, u, DAE, init_or_limiting)
         derivs_wanted = 0;
     end
 
-    % initialize out to zeros: POTENTIAL VECVALDER PROBLEM
-    out = zeros(DAE.n_limitedvars,DAE.n_unks)*x; % HACK to make out the right-sized vecvalder 
+    % initialize out to sparse: POTENTIAL VECVALDER PROBLEM
+    out = sparse(DAE.n_limitedvars,DAE.n_unks)*x; % HACK to make out the right-sized vecvalder 
     if DAE.n_inputs > 0 && length(u) > 0
-        out = out + zeros(DAE.n_limitedvars,DAE.n_inputs)*u;
+        out = out + sparse(DAE.n_limitedvars,DAE.n_inputs)*u;
     end
 
     % set up a sparse matrix of the right size for the derivatives
@@ -1865,7 +1866,7 @@ function dxlimdx = dNRlimiting_dx(x, xlimOld, u, DAE)
 end % dNRlimiting_dx()
 
 function xlim = NRinitGuess(u, DAE)
-    xlim = init_limiting(zeros(feval(DAE.nunks, DAE), 1), [], u, DAE, 'init');
+    xlim = init_limiting(sparse(feval(DAE.nunks, DAE), 1), [], u, DAE, 'init');
 end % NRinitGuess
 
 %%%%%%%%%%%%%%%%%%%%%% FIRST DERIVATIVES wrt x, u %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1914,14 +1915,14 @@ function out = C(DAE)
 end % C(...)
 
 function out = D(DAE)
-    out = zeros(DAE.n_outputs, DAE.n_inputs);
+    out = sparse(DAE.n_outputs, DAE.n_inputs);
 end % D(...)
 
 %%%%%%%%%%%%%%%%% QSS/NR INITIAL GUESS SUPPORT %%%%%%%%%%%%%%%%%%%%%%
 % function out = NRinitGuess(u, DAE)         % NOT WRITTEN YET
 %     % in principle, could use some heuristic dependent on the input
 %     % and the parameters,
-%     out = zeros(DAE.n_unks,1);
+%     out = sparse(DAE.n_unks,1);
 % end %NRinitGuess
 
 %%%%%%%%%%%%%%%%% NR LIMITING SUPPORT %%%%%%%%%%%%%%%%%%%%%%
@@ -1975,4 +1976,3 @@ end % internalfuncs
 
 %%%%%%%%%%%%%%%% STUFF BELOW IS NOT PART OF DAE API %%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%% other local functions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
