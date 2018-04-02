@@ -199,10 +199,10 @@ function [dae, outputs, sim_args] = daeMOSDiffpair(varargin)
             fprintf(2, 'Found initial guess for DAE: %s in %s\n', sim_args.daeIdentifier, base_initguess_filename);
             load(initguess_filename);
         else
-            initguess = zeros(dae.nunks(dae), 1);
+            initguess = randn(dae.nunks(dae), 1);
             % Generating an initial guess using voltage stepping
             n_vdd_steps = dae.nunks(dae);
-            for vdd_val = [ linspace( 0.1, VDD, n_vdd_steps)];
+            for vdd_val = [ linspace( 0.5*VDD, VDD, n_vdd_steps)];
                 stepping_dae = dae.set_uQSS('Vdd:::E', vdd_val, dae); 
                 op_pt = op(stepping_dae, initguess);
                 initguess = op_pt.getSolution(op_pt);

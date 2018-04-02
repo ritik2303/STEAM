@@ -1,7 +1,10 @@
 function oobj = dcsweep(DAE, initguess, inpORparmNAME, inpORparmRange, ...
-                                 inpORparm, init, limiting)
+                                 inpToStep, stepRange, inpORparm, init, limiting)
 %function QSSsweepObj = dcsweep(DAE, initguess, inpORparmNAME, ...
 %                       inpORparmRange, IsInpORparm, init, limiting)
+%
+% Updated: April 18, 2017
+%   - Added source stepping if Newton does not converge at any point
 %
 %Run a DC sweep analysis on DAE with respect to one input or parameter.
 %
@@ -22,6 +25,11 @@ function oobj = dcsweep(DAE, initguess, inpORparmNAME, inpORparmRange, ...
 % - inpORparmNAME: the name of an input to the DAE (from feval(DAE.inputnames,
 %              DAE)) or a parameter of the DAE (from feval(DAE.parmnames,DAE)).
 %              This input or parameter will be swept.
+%
+% - inpToStep: In case NR fails, which input should be stepped to get a reasonable 
+%               solution
+%
+% - stepRange: What should be the range in which this value should be stepped
 %
 % - inpORparmRange: an array of values to step inpORparmNAME through. Eg,
 %              -0.5:0.1:0.5 or 10:-0.1:9. Need not be monotonic or "continuous",
@@ -112,7 +120,8 @@ function oobj = dcsweep(DAE, initguess, inpORparmNAME, inpORparmRange, ...
 
 	% setup skeleton: data and function pointers
 	oobj.allstepvals = inpORparmRange; 
-    oobj.solutions = [];
+        oobj.solutions = [];
+        oobj.total_iters = 0;
 	oobj.solvalid = 0;
 	% oobj.print = @dcsweep_print; % below
 	oobj.plot = @dcsweep_plot; % below
@@ -126,10 +135,20 @@ function oobj = dcsweep(DAE, initguess, inpORparmNAME, inpORparmRange, ...
 		oobj.inpORparm = 1; % input
 		oobj.inpORparmidx = idx;
 	elseif length(idx) > 1
-		error('dcsweep: input name %s found more than once amongst DAE inputs (DAE definition error)');
+		error('dcsweep: input name %s found more than once amongst DAE inputs (DAE definition error)', inpORparmNAME);
 	end
 
-	if nargin > 4 && ~(0 == inpORparm || 1 == inpORparm)
+        do_stepping = 1;
+        if ( nargin < 6 ) || isempty(inpToStep) || isempty(stepRange)
+            do_stepping = 0;
+        else
+	    idx = find(strcmp(inpToStep, feval(DAE.inputnames, DAE)));
+            if (length(idx) ~= 1)
+		error('dcsweep: input name %s not found EXACTLY once amongst DAE inputs for stepping', inpToStep);
+            end
+        end
+
+	if nargin > 6 && ~(0 == inpORparm || 1 == inpORparm)
 		error('dcsweep: optional argument inpORparm, if specified, must be either 1 or 0 (you supplied %d)', inpORparm);
 	end
 
@@ -158,11 +177,11 @@ function oobj = dcsweep(DAE, initguess, inpORparmNAME, inpORparmRange, ...
 
 	oobj.inpORparmNAME = inpORparmNAME;
 
-    if (nargin < 6) || isempty(init)
+    if (nargin < 8) || isempty(init)
         init = 1;
     end
 
-    if (nargin < 7) || isempty(limiting)
+    if (nargin < 9) || isempty(limiting)
         limiting = 1;
     end
 
@@ -196,23 +215,38 @@ function oobj = dcsweep(DAE, initguess, inpORparmNAME, inpORparmRange, ...
         [sol, iters, success] = feval(oobj.QSSobj.getSolution, oobj.QSSobj);
 
 		if (success ~= 1) || sum(NaN == sol)
-			% try with device initialization
-			if 0 == NRparms.init || 0 == NRparms.limiting
-				NRparms.init = 1;
-				NRparms.limiting = 1;
-				continue;
-			end
-			% declare failure
-			fprintf(1, 'QSS failed at %s=%g\nre-running with NR progress enabled\n', inpORparmNAME, curval);
-			NRparms.dbglvl = 2;
-			oobj.QSSobj = feval(oobj.QSSobj.setNRparms, NRparms, ...
-			                   oobj.QSSobj);
-			oobj.QSSobj = feval(oobj.QSSobj.solve, initguess, ...
-					    oobj.QSSobj);
-			error('aborting DC sweep due to QSS failure.');
+                        if (do_stepping)
+                            fprintf('Running source stepping with %s\n', inpToStep); 
+                            % Create a copy of a the DAE to run QSS.
+                            % [TODO]: Make sure that the final value of the swept input should be the same as the
+                            % current value
+                            % We are implementing this sweep by calling DC sweep again. Need to make sure that the code
+                            % doesn't go into an recursive loop forever
+                            step_initguess = zeros(DAE.nunks(DAE), 1);
+                            step_sweep = dcsweep(DAE, step_initguess, inpToStep, stepRange);
+                            initguess = step_sweep.solutions(:, end);
+                            continue;
+                        else
+                            % try with device initialization
+                            if 0 == NRparms.init || 0 == NRparms.limiting
+                                    NRparms.init = 1;
+                                    NRparms.limiting = 1;
+                                    continue;
+                            end
+
+                            % declare failure
+                            fprintf(1, 'QSS failed at %s=%g\nre-running with NR progress enabled\n', inpORparmNAME, curval);
+                            NRparms.dbglvl = 2;
+                            oobj.QSSobj = feval(oobj.QSSobj.setNRparms, NRparms, ...
+                                               oobj.QSSobj);
+                            oobj.QSSobj = feval(oobj.QSSobj.solve, initguess, ...
+                                                oobj.QSSobj);
+                            error('aborting DC sweep due to QSS failure.');
+                        end
 		else
 			fprintf(1, '\t\tsolve succeeded at %s=%g\n',...
 				   			inpORparmNAME, curval);
+                        oobj.total_iters = oobj.total_iters + iters;
 			oobj.solutions(:,i) = sol;
 			oobj.inputs(:,i) = feval(DAE.uQSS, DAE);
 			initguess = sol;
@@ -248,6 +282,10 @@ function figs = dcsweep_plot(oobj)
 	DAEname = feval(oobj.QSSobj.DAE.daename, oobj.QSSobj.DAE);
 
     % TODO: no StateOutputs support yet, just DAE-defined outputs
+    % There is no need to implement a separate function for this. One can
+    % just use the existing transientPlot for plotting the result of a
+    % dcsweep as well (Just set time units to be volts and redo the axis
+    % labels) -AG
     C = feval(oobj.QSSobj.DAE.C, oobj.QSSobj.DAE);
     D = feval(oobj.QSSobj.DAE.D, oobj.QSSobj.DAE);
     outputvals = C*oobj.solutions + D*oobj.inputs;
