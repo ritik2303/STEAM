@@ -1,1 +1,0 @@
-../help/MAPPtest-HOWTO.txt
