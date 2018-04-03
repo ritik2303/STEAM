@@ -37,10 +37,17 @@ function [speedup, estimation_error, baseSolution] = runACAnalysis( ...
     method_spl.setOrder(spl_order);
 
     % Running steam circuit (Maybe be tabulated/2-dimensional etc.)
+    %{
     [steam_dae, steam_outs, sim_args] = daeMOSGilbertCell(model, parm_string, subCkt, method_spl);
     [bli_dae, bli_outs] = daeMOSGilbertCell(model, parm_string, subCkt, method_bli);
     [base_dae, base_outs] = daeMOSGilbertCell(model, parm_string, subCkt);
     daeIdentifier = 'GilbertCell';
+    %}
+
+    [steam_dae, steam_outs] = daeMOSInverter(model, parm_string, subCkt, method_spl);
+    [bli_dae, bli_outs] = daeMOSInverter(model, parm_string, subCkt, method_bli);
+    [base_dae, base_outs, sim_args] = daeMOSInverter(model, parm_string, subCkt);
+    daeIdentifier = 'inverter';
 
     v2struct(sim_args);
     fstart = 1;

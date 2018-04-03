@@ -114,6 +114,34 @@ function [dae, outputs, simArgs] = daeMOSInverter(varargin)
     QSS = dae.utransient(simArgs.tstart, dae);
     dae = dae.set_uQSS(QSS, dae); % Vin is irrelevant for DCSWEEP
 
+    if (nargout > 2)
+        % Checking if we have already computed an initial guess
+        simArgs.daeIdentifier = [varargin{2}, '_inverter'];
+        global STEAM_DATA_DIR;
+        base_initguess_filename = [simArgs.daeIdentifier, '_initguess.mat'];
+        initguess_filename = [STEAM_DATA_DIR, base_initguess_filename];
+
+        if (exist(initguess_filename, 'file'))
+            fprintf(2, 'Found initial guess for DAE: %s in %s\n', simArgs.daeIdentifier, base_initguess_filename);
+            load(initguess_filename, '-mat');
+        else
+            initguess = zeros(dae.nunks(dae), 1);
+            % Generating an initial guess using voltage stepping
+            n_vdd_steps = 5;
+            for vdd_val = [ linspace( 0.1, VDD, n_vdd_steps)];
+                stepping_dae = dae.set_uQSS('vdd:::E', vdd_val, dae); 
+                % This is for DC Analysis only. Comment out for Transient
+                stepping_dae = stepping_dae.set_uQSS('vin:::E', ...
+                    simArgs.v_start, stepping_dae); 
+                op_pt = op(stepping_dae, initguess);
+                initguess = op_pt.getSolution(op_pt);
+            end
+            fprintf(2, 'Saving generated initial-guess in %s for later use\n', base_initguess_filename);
+            save(initguess_filename, 'initguess', '-v7');
+        end
+        simArgs.xinit = initguess;
+    end
+
     outputs = StateOutputs(dae);
     outputs = outputs.DeleteAll(outputs);
     outputs = outputs.Add({'e_in', 'e_out'}, outputs);
