@@ -176,7 +176,6 @@ function [figh, onames, colindex] = transientPlot(DAE, tpts, vals, ...
 %% reserved.                                                                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-ls
 if nargin >= 5 && ischar(varargin{1}) % second calling syntax with 'optionName'
 	    % defaults
 		time_units = '';

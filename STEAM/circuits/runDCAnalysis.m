@@ -19,7 +19,14 @@ function [speedup, estimation_error, base_solution] = runDCAnalysis(...
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    narginchk(4,4);
+    if (nargin == 0)
+        model = @bsim3;
+        parm_string = 'VA_BSIM3';
+        n_pieces = 4;
+        order = 4;
+    else
+        narginchk(4,4);
+    end
 
     global data_dir;
     subCkt = [];
