@@ -83,7 +83,7 @@ function [x, vds, vgs] = loadBSIMSlice(discretization_step, sampling_args)
         qi = zeros(nSamples, nImplicitEqns);
 
         flag.fe = 0; flag.qe = 0; flag.fi = 1; flag.qi = 1;
-        fprintf(2, 'Evaluating Model on linear grid on size %d\n', nSamples);
+        fprintf(2, 'Evaluating Model on linear grid on size %d.\n', nSamples);
         for k_index = 1:nSamples
             [~, ~, fi_k, qi_k] = MOD.fqei([vds(k_index); vgs(k_index); 0], ...
                 [vds(k_index); 0], [], flag, MOD);
@@ -92,7 +92,7 @@ function [x, vds, vgs] = loadBSIMSlice(discretization_step, sampling_args)
         end
         save(data_filename, 'fi', 'qi');
     else
-        fprintf(2, 'Found model data in %s\n, Skipping data generation\n', ...
+        fprintf(2, 'Found model data in %s.\nSkipping data generation.\n', ...
             base_filename);
         load(data_filename);
     end

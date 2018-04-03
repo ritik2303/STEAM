@@ -39,6 +39,9 @@
 
 function [xp, tp, niter] = tvqc_newton(x0, t0, A, At, b, epsilon, tau, newtontol, newtonmaxiter, cgtol, cgmaxiter) 
 
+% Scale epsilon by the norm of b, just to keep the parameter independent of the norm of b.
+epsilon = epsilon * sumsqr(b);
+
 largescale = isa(A,'function_handle'); 
 
 alpha = 0.01;
@@ -58,7 +61,11 @@ if (~largescale),  AtA = A'*A;  end;
 % initial point
 x = x0;
 t = t0;
-if (largescale), r = A(x) - b;  else  r = A*x - b; end  
+if (largescale)
+  r = A(x) - b;
+else
+  r = A*x - b;
+end  
 Dhx = Dh*x;  Dvx = Dv*x;
 ft = 1/2*(Dhx.^2 + Dvx.^2 - t.^2);
 fe = 1/2*(r'*r - epsilon^2);
@@ -93,7 +100,7 @@ while (~done)
       Dh'*sparse(diag(sigb.*Dhx.*Dvx))*Dv + ...
       Dv'*sparse(diag(sigb.*Dhx.*Dvx))*Dh - ...
       (1/fe)*AtA + (1/fe^2)*Atr*Atr';
-    opts.POSDEF = true; opts.SYM = true;
+    opts.SYM = true;
     [dx,hcond] = linsolve(H11p, w1p, opts);
     if (hcond < 1e-14)
       disp('Matrix ill-conditioned.  Returning previous iterate.  (See Section 4 of notes for more information.)');

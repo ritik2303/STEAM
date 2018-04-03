@@ -47,6 +47,9 @@
 
 function [xp, tp] = tvqc_logbarrier(x0, A, At, b, epsilon, lbtol, mu, cgtol, cgmaxiter)  
 
+% Scale epsilon by the norm of b, just to keep the parameter independent of the norm of b.
+epsilon = epsilon * sqrt(sumsqr(b));
+
 largescale = isa(A,'function_handle'); 
 
 if (nargin < 6), lbtol = 1e-3; end
