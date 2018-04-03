@@ -1,5 +1,7 @@
-function required_dct_coeffs = BSIMdct(discretization_step, error_thresh)
-% function required_dct_coeffs = BSIMdct(discretization_step, error_thresh)
+function required_dct_coeffs = BSIM_2D_DCT(discretization_step, error_thresh, ...
+    compression_factor)
+% function required_dct_coeffs = BSIM_2D_DCT(discretization_step, error_thresh, ...
+%     compression_factor)
 % Author: Archit Gupta (Nov. 8, 2016)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
