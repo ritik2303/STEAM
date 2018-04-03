@@ -88,7 +88,6 @@ function [speedup, estimation_error, base_solution] = runTransientAnalysis(model
 
         %{
         fprintf(2, 'Saving TRAN results in %s\n', analysis_filename);
-
         % No need to have the DAE's in the LMS objects. It blows up the size unnecessarily
         base_lms_obj.DAE = [];
         base_lms_obj.AFobj = [];
@@ -97,17 +96,8 @@ function [speedup, estimation_error, base_solution] = runTransientAnalysis(model
         steam_lms_obj.DAE = [];
         steam_lms_obj.AFobj = [];
         save(analysis_filename, 'base_lms_obj', 'base_eval_time', 'steam_lms_obj', 'steam_eval_time', 'bli_lms_obj', 'bli_eval_time', '-v7.3');
+        %}
     end
-    %}
-    
-    % Transient Analysis on Tabulated circuit's dae
-    % xinit2 = xinit1;    % Hack for devices with no internal unknowns
-    % clear functions;
-
-    %{
-    bli_eval_time = steam_eval_time;
-    bli_lms_obj = steam_lms_obj;
-    %}
 
     speedup.STEAM = base_eval_time/steam_eval_time;
     speedup.BLI = base_eval_time/bli_eval_time
@@ -124,11 +114,12 @@ function [speedup, estimation_error, base_solution] = runTransientAnalysis(model
     bli_op_indices = bli_outs.OutputIndices(bli_outs);
     base_op_indices = base_outs.OutputIndices(base_outs);
 
-    %{
-    steam_vals_at_base_pts = spline_1d(steam_tpts', steam_vals(steam_op_indices,:)', ...
-        base_tpts');
-    bli_vals_at_base_pts = spline_1d(bli_tpts', bli_vals(bli_op_indices,:)', base_tpts');
-    %}
+    % When we are dealing with very high accuracy, this interpolation error
+    % might start kicking in and corrupting the accuracy that we get with
+    % ALACARTE.
+    steam_vals_at_base_pts = spline(steam_tpts, steam_vals(steam_op_indices,:), ...
+        base_tpts);
+    bli_vals_at_base_pts = spline(bli_tpts, bli_vals(bli_op_indices,:), base_tpts);
     steam_vals_at_base_pts = steam_vals(steam_op_indices,:)';
     bli_vals_at_base_pts = bli_vals(bli_op_indices,:)';
     base_solution = base_vals(base_op_indices,:);
