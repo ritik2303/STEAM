@@ -46,14 +46,14 @@ function needForPP(m_handle, m_identifier, m_generator, do_plots)
     %}
 
     % B. Variation with order alone
-    %{
-    n_pieces_to_try = [4];
+    n_pieces_to_try = [1];
     orders_to_try   = [2:2:8];
-    %}
 
     % C. Variation with number of pieces alone
+    %{
     n_pieces_to_try = [4, 8, 16, 32];
     orders_to_try   = [6];
+    %}
 
     usp_speedup_spline = zeros(length(n_pieces_to_try), length(orders_to_try));
     usp_speedup_bli = zeros(length(n_pieces_to_try), length(orders_to_try));
@@ -66,7 +66,7 @@ function needForPP(m_handle, m_identifier, m_generator, do_plots)
             spl_order = round( log10(n_pieces_to_try(p_iter))/log10(2) ) + order_single_piece;
             bli_obj = PiecewiseBLI(f_handle, 1, bounds, order_single_piece, i_type_bli);
             spl_obj = Spline1D(f_handle, 1, {[VMIN; VMAX]},  spl_order, i_type_spl);
-            [est_err, est_speedup] = compareIObjs(n_test_pts, {bounds_single_piece}, MOD, bli_obj, 'BLI', spl_obj, 'SPLINE');
+            [est_err, est_speedup, err_plot] = compareIObjs(n_test_pts, {bounds_single_piece}, MOD, bli_obj, 'BLI', spl_obj, 'SPLINE');
             usp_speedup_spline(p_iter, o_iter) = est_speedup(2);
             usp_speedup_bli(p_iter, o_iter) = est_speedup(1);
             usp_err_spline(p_iter, o_iter) = est_err(2);
