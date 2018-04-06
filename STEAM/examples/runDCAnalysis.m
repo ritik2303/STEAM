@@ -47,21 +47,13 @@ function [speedup, estimation_error, base_solution] = runDCAnalysis(...
     method_spl.setOrder(spl_order);
 
     subCkt = getSubCkt(parm_string);
+    daeGenerator = @daeMOSInverter;
 
     % Running steam circuit (Maybe be tabulated/2-dimensional etc.)
-    [steam_dae, steam_outs] = daeMOSDiffpair(model, parm_string, ...
+    [steam_dae, steam_outs] = daeGenerator(model, parm_string, ...
         subCkt, method_spl);
-    [bli_dae, bli_outs] = daeMOSDiffpair(model, parm_string, subCkt, method_bli);
-    [base_dae, base_outs, simArgs] = daeMOSDiffpair(model, parm_string, subCkt);
-    daeIdentifier = 'diffpair';
-
-    %{
-    [steam_dae, steam_outs] = daeMOSInverter(model, parm_string, ...
-        subCkt, method_spl);
-    [bli_dae, bli_outs] = daeMOSInverter(model, parm_string, subCkt, method_bli);
-    [base_dae, base_outs, simArgs] = daeMOSInverter(model, parm_string, subCkt);
-    daeIdentifier = 'inverter';
-    %}
+    [bli_dae, bli_outs] = daeGenerator(model, parm_string, subCkt, method_bli);
+    [base_dae, base_outs, simArgs] = daeGenerator(model, parm_string, subCkt);
 
     v2struct(simArgs);
     dae_inputs = base_dae.uQSS(base_dae);

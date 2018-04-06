@@ -46,6 +46,8 @@ function [dae, outputs, simArgs] = daeMOSInverter(varargin)
 
     parm_string = varargin{2};
     kBSIM = findstr(parm_string, 'BSIM');
+    kSH = findstr(parm_string, 'SH');
+    kPSP = findstr(parm_string, 'PSP');
     kMVS = findstr(parm_string, 'MVS');
     
     % AC analysis arguments
@@ -60,30 +62,21 @@ function [dae, outputs, simArgs] = daeMOSInverter(varargin)
     sinArgs.f = 1e6;
     sinArgs.Offset = VInOffset;
 
-    if (~isempty(kBSIM))
-        simArgs.tstop = 4/sinArgs.f;
+    % Transient Arguments
+    simArgs.tstart = 0;
+    simArgs.tstep = 0.05/sinArgs.f;
+    simArgs.tstop = 4/sinArgs.f;
 
+    if (~isempty(kBSIM) || ~isempty(kSH) || ~isempty(kPSP))
         % DC Analysis Arguments
         simArgs.v_start = 0;
-        simArgs.v_step = 0.2;
+        simArgs.v_step = 0.02;
         simArgs.v_stop = VDD;
-
-        % Transient Arguments
-        simArgs.tstart = 0;
-        simArgs.tstep = 0.05/sinArgs.f;
-        simArgs.tstop = 4/sinArgs.f;
     elseif(~isempty(kMVS))
-        sinArgs.A = 0.2;
-
-        % Transient Arguments
-        simArgs.tstart = 0;
-        simArgs.tstep = 0.05/sinArgs.f;
-        simArgs.tstop = 4/sinArgs.f;
-
-        % DC Analysis Arguments
+        % DC Analysis Arguments: For MVS, it works better this way
         %simArgs.v_start = 0.85*VDD;
         simArgs.v_start = VDD;
-        simArgs.v_step = -0.2;
+        simArgs.v_step = -0.02;
         simArgs.v_stop = 0;
     else
         fprintf(2, 'Circuit parameters not found for the given MOS model\n');
