@@ -39,14 +39,8 @@ function [speedup, estimation_error, base_solution] = runDCAnalysis(...
     method_spl = STEAMArgs(2, 'spline', 'uniform', 1);
     method_spl.setOrder(spl_order);
 
-    if (strfind( parm_string, 'BSIM' ))
-        subCkt = @BSIM_with_RsRd;
-    elseif (strfind( parm_string, 'MVS' ))
-        subCkt = @MVS_with_RsRd; 
-    elseif (strfind( parm_string, 'PSP' ))
-        subCkt = @PSP_subckt; 
-    end
-    
+    subCkt = getSubCkt(parm_string);
+
     % Running steam circuit (Maybe be tabulated/2-dimensional etc.)
     [steam_dae, steam_outs] = daeMOSDiffpair(model, parm_string, ...
         subCkt, method_spl);

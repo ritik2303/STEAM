@@ -176,6 +176,7 @@ function [dae, outputs, sim_args] = daeMOSDiffpair(varargin)
     constFunc = @(t,a) a.Val;
     
     inFunc = sinFunc; in_args = sin_args;
+    sim_args.f0 = in_args.f;
     %inFunc = stepFunc; in_args = step_args;
 
     % Setting up transient inputs

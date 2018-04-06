@@ -33,14 +33,7 @@ function [speedup, estimation_error, freq_error] = runHB(...
     method_spl = STEAMArgs(2, 'spline', 'uniform', 1);
     method_spl.setOrder(spl_order);
 
-    if (strfind( parm_string, 'BSIM' ))
-        sub_ckt = @BSIM_with_RsRd;
-    elseif (strfind( parm_string, 'MVS' ))
-        sub_ckt = @MVS_with_RsRd; 
-    elseif (strfind( parm_string, 'PSP' ))
-        sub_ckt = @PSP_subckt;
-    end
-   
+    subCkt = getSubCkt(parm_string);
     % 3-Stage ring-oscillator
     is_osc = 1;
     %f0 = 5.9106e+06;
