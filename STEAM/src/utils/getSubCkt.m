@@ -12,6 +12,8 @@ function subCkt = getSubCkt(parm_string)
     elseif (strfind( parm_string, 'MVS' ))
         subCkt = @MVS_with_RsRd; 
     elseif (strfind( parm_string, 'PSP' ))
-        subCkt = @PSP_subckt; 
+        subCkt = @MOSFET3T_subckt; 
+    elseif (strfind( parm_string, 'SH'))
+        subCkt = @MOSFET3T_subckt;
     end
 end

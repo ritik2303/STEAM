@@ -174,19 +174,6 @@ function [fe, qe, fi, qi] = fqei(vecX, vecY, vecLim, vecU, flag, MOD)
         vecLim = feval(MOD.vecXYtoLimitedVars, vecX, vecY, MOD);
     end
 
-    if ~isfield(flag,'fe')
-        flag.fe =0;
-    end
-    if ~isfield(flag,'qe')
-        flag.qe =0;
-    end
-    if ~isfield(flag,'fi')
-        flag.fi =0;
-    end
-    if ~isfield(flag,'qi')
-        flag.qi =0;
-    end
-
     % parms
     Type = MOD.parm_vals{1};
     Beta = MOD.parm_vals{2};

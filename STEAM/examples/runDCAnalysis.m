@@ -20,8 +20,15 @@ function [speedup, estimation_error, base_solution] = runDCAnalysis(...
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     if (nargin == 0)
+        % Use BSIM3
+        %{
         model = @bsim3;
         parm_string = 'VA_BSIM3';
+        %}
+
+        % Use Shichman Hodges model
+        model = @SH_MOS_ModSpec;
+        parm_string = 'SH';
         n_pieces = 4;
         order = 4;
     else

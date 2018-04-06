@@ -150,7 +150,20 @@ function [dae, outputs, sim_args] = daeMOSDiffpair(varargin)
         sim_args.VIN_MIN = 0.4;
         sim_args.VIN_MAX = 0.6;
         sim_args.n_ops = 2;
-    else
+    elseif(findstr(varargin{2}, 'SH'))
+        IS = 1e-6;
+        VInOffset = 0.4;
+        sinAmp = 0.05;
+
+        % Transient Arguments
+        sim_args.tstart = 0;
+        sim_args.tstep = 6e-5;
+        sim_args.tstop = 8e-3;
+
+        % AC Analysis Arguments
+        sim_args.VIN_MIN = 0.4;
+        sim_args.VIN_MAX = 0.6;
+        sim_args.n_ops = 2;
         fprintf(2, 'Circuit parameters not found for the given MOS model\n');
     end
 

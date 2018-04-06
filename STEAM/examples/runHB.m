@@ -23,7 +23,6 @@ function [speedup, estimation_error, freq_error] = runHB(...
     end
 
     global STEAM_DATA_DIR;
-    sub_ckt = [];
 
     % Arguments for running STEAM with compressed sensing
     method_bli = STEAMArgs(2, 'bli', 'chebyshev', n_pieces);
@@ -38,9 +37,9 @@ function [speedup, estimation_error, freq_error] = runHB(...
     is_osc = 1;
     %f0 = 5.9106e+06;
     f0 = 1.0406e+07;
-    [steam_dae, steam_outs] = daeMOSRingosc(3, model, parm_string, sub_ckt, method_spl);
-    [bli_dae, bli_outs] = daeMOSRingosc(3, model, parm_string, sub_ckt, method_bli);
-    [base_dae, base_outs, sim_args] = daeMOSRingosc(3, model, parm_string, sub_ckt);
+    [steam_dae, steam_outs] = daeMOSRingosc(3, model, parm_string, subCkt, method_spl);
+    [bli_dae, bli_outs] = daeMOSRingosc(3, model, parm_string, subCkt, method_bli);
+    [base_dae, base_outs, sim_args] = daeMOSRingosc(3, model, parm_string, subCkt);
     daeIdentifier = '3_Stage_RingOscillator';
     %{
     [~, steam_tran_xinit] = ringOscInitializer(3);
@@ -51,9 +50,9 @@ function [speedup, estimation_error, freq_error] = runHB(...
     %{
     is_osc = 0;
     f0 = 1e6;
-    [steam_dae, steam_outs] = daeMOSGilbertCell(model, parm_string, sub_ckt, method_spl);
-    [bli_dae, bli_outs] = daeMOSGilbertCell(model, parm_string, sub_ckt, method_bli);
-    [base_dae, base_outs, sim_args] = daeMOSGilbertCell(model, parm_string, sub_ckt);
+    [steam_dae, steam_outs] = daeMOSGilbertCell(model, parm_string, subCkt, method_spl);
+    [bli_dae, bli_outs] = daeMOSGilbertCell(model, parm_string, subCkt, method_bli);
+    [base_dae, base_outs, sim_args] = daeMOSGilbertCell(model, parm_string, subCkt);
     steam_tran_xinit = zeros(steam_dae.nunks(steam_dae), 1);
     bli_tran_xinit = zeros(bli_dae.nunks(bli_dae), 1);
     base_tran_xinit = zeros(base_dae.nunks(base_dae), 1);

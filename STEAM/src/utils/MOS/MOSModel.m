@@ -36,9 +36,9 @@ classdef MOSModel < ModSpecModel
         end
 
         % Default implementation of fqeiJ
-        function [fqei, J] = fqeiJ(mod, x_in, flag)
-            if (nargin < 3)
-                flag = mod.flag;
+        function [fqei, J] = fqeiJ(mod, x_in, maybe_flag, ~, flag, ~)
+            if (nargin == 3)
+                flag = maybe_flag;
             end
             [fqei, J] = mod.base_model.fqeiJ(x_in, [], [], flag, ...
                 mod.base_model);
