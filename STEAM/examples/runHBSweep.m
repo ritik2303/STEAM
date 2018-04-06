@@ -10,12 +10,12 @@ function runHBSweep(model, parm_string, n_pieces, order)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     if (nargin < 2)
+        %{
         model = @bsim3;
         parm_string = 'VA_BSIM3';
-        %{
+        %}
         model = @SH_MOS_ModSpec;
         parm_string = 'SH';
-        %}
     else
         narginchk(2,4);
     end

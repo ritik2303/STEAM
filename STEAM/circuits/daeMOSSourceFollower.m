@@ -16,6 +16,7 @@ function [dae, outputs, sim_args] = daeMOSSourceFollower(model, parm_string, ...
 
     % Circuit parameters (just the resistance being used) 
     Rs  = 1.0e3;
+    Rd  = 1.0e3;
 
     vinElem.name    = 'vin';
     vinElem.model   = vsrcModSpec('vin');
@@ -24,15 +25,20 @@ function [dae, outputs, sim_args] = daeMOSSourceFollower(model, parm_string, ...
 
     vddElem.name    = 'vdd';
     vddElem.model   = vsrcModSpec('vdd');
-    vddElem.nodes   = {'vdd', 'd'};
+    vddElem.nodes   = {'vdd', 'gnd'};
     vddElem.parms   = {};
+
+    rdElem.name     = 'rd';
+    rdElem.model    = resModSpec('rs');
+    rdElem.nodes    = {'d', 'vdd'};
+    rdElem.parms    = {Rs};
 
     rsElem.name     = 'rs';
     rsElem.model    = resModSpec('rs');
     rsElem.nodes    = {'s', 'gnd'};
     rsElem.parms    = {Rs};
 
-    cktdata.elements = {vinElem, vddElem, rsElem};
+    cktdata.elements = {vinElem, vddElem, rsElem, rdElem};
 
     mos_parm_string = strcat(parm_string, '_NMOS');
     if (nargin > 3)
@@ -49,7 +55,7 @@ function [dae, outputs, sim_args] = daeMOSSourceFollower(model, parm_string, ...
 
     % Create the simulation arguments
     VDD = 1.0;
-    VInOffset = 0.5;
+    VInOffset = 0.3;
     sinAmp = 1e-3;
 
     % DC Sweep Arguments 
@@ -76,8 +82,8 @@ function [dae, outputs, sim_args] = daeMOSSourceFollower(model, parm_string, ...
 
     % Different Transient Inputs to try
     vdd_args.Val    = VDD;
-    sin_args.f      = 500;
-    sin_args.A      = 0.6;
+    sin_args.f      = 1000;
+    sin_args.A      = 0.2;
     sin_args.Offset = VInOffset;
 
     % Transient function description
