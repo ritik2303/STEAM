@@ -121,7 +121,7 @@ function [dae, outputs, sim_args] = daeMOSDiffpair(varargin)
     if (findstr(varargin{2}, 'BSIM'))
         IS = 2.4e-5;  
         VInOffset = VCM;
-        simAmp = 0.1;
+        sinAmp = 0.1;
 
         % Transient Arguments
         sim_args.tstart = 0;
@@ -130,7 +130,7 @@ function [dae, outputs, sim_args] = daeMOSDiffpair(varargin)
     elseif(findstr(varargin{2}, 'PSP'))
         IS = 8e-6;  
         VInOffset = VCM;
-        simAmp = 0.1;
+        sinAmp = 0.1;
 
         % Transient Arguments
         sim_args.tstart = 0;

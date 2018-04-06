@@ -38,21 +38,20 @@ function [speedup, estimation_error, base_solution] = runTransientAnalysis(model
         subCkt = @PSP_subckt;
     end
     
-    % Inverter
-    n_inverters = 1;
-    [steam_dae, steam_outs] = daeMOSInverterChain(n_inverters, model, parm_string, subCkt, method_spl);
-    [bli_dae, bli_outs] = daeMOSInverterChain(n_inverters, model, parm_string, subCkt, method_bli);
-    [base_dae, base_outs, sim_args] = daeMOSInverterChain(n_inverters, model, parm_string, subCkt);
-    daeIdentifier = 'inverter';
-
-    % 3-Stage ring-oscillator
+    % Ring-oscillator or inverter chain
+    n_inverters  = 1;
     %{
-    [steam_dae, steam_outs] = daeMOSRingosc(3, model, parm_string, subCkt, method_spl);
-    [bli_dae, bli_outs] = daeMOSRingosc(3, model, parm_string, subCkt, method_bli);
-    [base_dae, base_outs, sim_args] = daeMOSRingosc(3, model, parm_string, subCkt);
-    daeIdentifier = '3_Stage_RingOscillator';
-    xinit = rand(steam_dae.nunks(steam_dae), 1);
+    daeGenerator = @daeMOSInverterChain; 
+    [steam_dae, steam_outs] = daeGenerator(n_inverters, model, parm_string, subCkt, method_spl);
+    [bli_dae, bli_outs] = daeGenerator(n_inverters, model, parm_string, subCkt, method_bli);
+    [base_dae, base_outs, sim_args] = daeGenerator(n_inverters, model, parm_string, subCkt);
     %}
+
+    % Any other circuit
+    daeGenerator = @daeMOSSourceFollower;
+    [steam_dae, steam_outs] = daeGenerator(model, parm_string, subCkt, method_spl);
+    [bli_dae, bli_outs] = daeGenerator(model, parm_string, subCkt, method_bli);
+    [base_dae, base_outs, sim_args] = daeGenerator(model, parm_string, subCkt);
 
     v2struct(sim_args);  % Creates tstart, tstep and tstop;
 
@@ -117,11 +116,9 @@ function [speedup, estimation_error, base_solution] = runTransientAnalysis(model
     % When we are dealing with very high accuracy, this interpolation error
     % might start kicking in and corrupting the accuracy that we get with
     % ALACARTE.
-    steam_vals_at_base_pts = spline(steam_tpts, steam_vals(steam_op_indices,:), ...
-        base_tpts);
-    bli_vals_at_base_pts = spline(bli_tpts, bli_vals(bli_op_indices,:), base_tpts);
-    steam_vals_at_base_pts = steam_vals(steam_op_indices,:)';
-    bli_vals_at_base_pts = bli_vals(bli_op_indices,:)';
+    steam_vals_at_base_pts = spline(steam_tpts', steam_vals(steam_op_indices,:), ...
+        base_tpts');
+    bli_vals_at_base_pts = spline(bli_tpts', bli_vals(bli_op_indices,:), base_tpts');
     base_solution = base_vals(base_op_indices,:);
 
 
@@ -129,11 +126,11 @@ function [speedup, estimation_error, base_solution] = runTransientAnalysis(model
     e_args.setDefaults();
     e_args.setEps(1e-8);
 
-    steam_est_err_wf = steam_vals_at_base_pts' - base_solution;
-    bli_est_err_wf = bli_vals_at_base_pts' - base_solution;
-    estimation_error.STEAM = find_error(steam_vals_at_base_pts' - base_solution, base_solution, e_args.eps(), ...
+    steam_est_err_wf = steam_vals_at_base_pts - base_solution;
+    bli_est_err_wf = bli_vals_at_base_pts - base_solution;
+    estimation_error.STEAM = find_error(steam_est_err_wf, base_solution, e_args.eps(), ...
         e_args.errorMode());
-    estimation_error.BLI = find_error(bli_vals_at_base_pts' - base_solution, base_solution, e_args.eps(), ...
+    estimation_error.BLI = find_error(bli_est_err_wf, base_solution, e_args.eps(), ...
         e_args.errorMode())
 
     if (nargout < 2)

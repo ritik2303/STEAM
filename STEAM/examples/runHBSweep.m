@@ -35,19 +35,19 @@ function runHBSweep(model, parm_string, n_pieces, order)
     end
 
     sub_ckt = getSubCkt(parm_string);
+    % daeGenerator = @daeMOSDiffpair;
+    daeGenerator = @daeMOSSourceFollower;
 
-    % Differential Pair
     is_osc = 0;
-    [base_dae, base_outs, sim_args] = daeMOSDiffpair(model, parm_string, sub_ckt);
+    [base_dae, base_outs, sim_args] = daeGenerator(model, parm_string, sub_ckt);
     base_tran_xinit = zeros(base_dae.nunks(base_dae), 1);
 
     if (run_STEAM)
-        [steam_dae, steam_outs] = daeMOSDiffpair(model, parm_string, sub_ckt, method_spl);
-        [bli_dae, bli_outs] = daeMOSDiffpair(model, parm_string, sub_ckt, method_bli);
+        [steam_dae, steam_outs] = daeGenerator(model, parm_string, sub_ckt, method_spl);
+        [bli_dae, bli_outs] = daeGenerator(model, parm_string, sub_ckt, method_bli);
         steam_tran_xinit = zeros(steam_dae.nunks(steam_dae), 1);
         bli_tran_xinit = zeros(bli_dae.nunks(bli_dae), 1);
     end
-    daeIdentifier = 'DiffPair';
 
     % Estimate of base frequency (f0) for the oscillator
     M                      = 27;  % Number of harmonics for single-tone HB
