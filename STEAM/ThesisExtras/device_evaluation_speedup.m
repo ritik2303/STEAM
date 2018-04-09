@@ -32,7 +32,6 @@ end
 % Draw a comparison between the original model and the STEAM generated
 % model to see the differences between the two
 n_test_pts     = 50;
-n_dims         = steam_model.n_in_dims;
 
 d_orders_to_try = 2:5;
 n_orders_to_try = length(d_orders_to_try);
