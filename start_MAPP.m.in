@@ -26,7 +26,7 @@ setupSTEAMPaths;
 cd(currentwd);
 fprintf(2,'MAPP paths have been set up.\n');
 fprintf(2,'--------------------------------------------------------------------------------\n\n');
-fprintf(2,'type "help MAPP" (without the quotes) to start.\n\n');
+fprintf(2,'type "help STEAM" (without the quotes) to start.\n\n');
 
 % working around some Octave quirks
 if 1 == isOctave
