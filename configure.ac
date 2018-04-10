@@ -68,89 +68,6 @@ then
 	with_VVimplementation="vv2"; # AC_MSG_NOTICE([VVimplementation set to default value vv2])
 fi
 
-LOCALA2oDAEAPI="Analyses2-on-DAEAPI"
-A2oDAEAPI=""; # if = "", no support for A2oDAEAPI
-AC_ARG_WITH([A2oDAEAPI],
-            [AS_HELP_STRING([--with-A2oDAEAPI],
-              [enable support for $LOCALA2oDAEAPI (default=no)])],
-            [],
-            [with_A2oDAEAPI=no])
-
-if test "$with_A2oDAEAPI" != "no"; then
-    if test -e ./Analyses2-on-DAEAPI; then
-        A2oDAEAPI="A2oDAEAPI-MATLAB";
-    else
-        AC_MSG_ERROR([echo --with-A2oDAEAPI specified, but no directory $LOCALA2oDAEAPI exists!])
-    fi
-fi
-
-LOCALA3oDAEAPI="Analyses3-on-DAEAPI"
-A3oDAEAPI=""; # if = "", no support for A3oDAEAPI
-AC_ARG_WITH([A3oDAEAPI],
-            [AS_HELP_STRING([--with-A3oDAEAPI],
-              [enable support for $LOCALA3oDAEAPI (default=no)])],
-            [],
-            [with_A3oDAEAPI=no])
-
-if test "$with_A3oDAEAPI" != "no"; then
-    if test -e ./Analyses3-on-DAEAPI; then
-        A3oDAEAPI="A3oDAEAPI-MATLAB";
-    else
-        AC_MSG_ERROR([echo --with-A3oDAEAPI specified, but no directory $LOCALA3oDAEAPI exists!])
-    fi
-fi
-
-LOCALCONTRIBS="contribs"
-CONTRIBS=""; # if = "", no support for contribs
-AC_ARG_WITH([usercontribs],
-            [AS_HELP_STRING([--with-usercontribs],
-              [enable support for user contributed modules (default=no)])],
-            [],
-            [with_usercontribs=no])
-
-if test "$with_usercontribs" != "no"; then
-    if test -e ./$LOCALCONTRIBS; then
-        CONTRIBS="contribs";
-    else
-        AC_MSG_ERROR([echo --with-usercontribs specified, but no directory ./contribs exists!])
-    fi
-fi
-
-LOCALOPTO="opticalStuff"
-OPTO=""; # if = "", no support for optical stuff
-AC_ARG_WITH([opto],
-            [AS_HELP_STRING([--with-opto],
-              [enable support for optical modelling (default=no)])],
-            [],
-            [with_opto=no])
-
-if test "$with_opto" != "no"; then
-    if test -e ./$LOCALOPTO; then
-        OPTO="opto-MATLAB";
-    else
-        AC_MSG_ERROR([echo --with-opto specified, but no directory ./opticalStuff exists!])
-    fi
-fi
-
-LOCALVAPP="VAPP"
-VAPP=""; # if = "", no support for VAPP
-AC_ARG_WITH([VAPP],
-            [AS_HELP_STRING([--with-VAPP],
-              [enable support for VAPP (Verilog-A Parser and Processor) (default=no)])],
-            [],
-            [with_VAPP=no])
-
-if test "$with_VAPP" != "no"; then
-    if test -e ./$LOCALVAPP; then
-        VAPP="VAPP";
-        cat help/help_MAPP.txt.in.src help/help_VAPP.txt > help/help_MAPP.txt.in
-    else
-        AC_MSG_ERROR([echo --with-VAPP specified, but no directory ./VAPP exists!])
-    fi
-else
-    cat help/help_MAPP.txt.in.src > help/help_MAPP.txt.in
-fi
-
 AC_PREFIX_DEFAULT("--prefix is NOT USED by MAPP")
 #THE_PREFIX=`test "$prefix" = NONE && prefix=$ac_default_prefix; eval echo "${prefix}"` # "hairy", because ac_default_prefix undocumented
 
@@ -162,10 +79,11 @@ DAEAPI="DAEAPI-MATLAB"
 LOCALDAEAPI="DAEAPI"
 DOCUMENTATION="Documentation"
 A1oDAEAPI="A1oDAEAPI-MATLAB"
+A2oDAEAPI="A2oDAEAPI-MATLAB"
 STEAM="STEAM"
 PPI="STEAM/polynomial-interpolation/matlab"
 LOCALA1oDAEAPI="Analyses1-on-DAEAPI"
-MAPPTESTDATABASE="$(pwd)/$LOCALA1oDAEAPI/test-data"
+LOCALA2oDAEAPI="Analyses2-on-DAEAPI"
 
 AC_SUBST(MAPPVERSION, $THEVERSION)
 AC_SUBST(BRANCHNAME, $BRANCHNAME)
@@ -180,22 +98,15 @@ AC_SUBST(DAEAPI, $DAEAPI)
 AC_SUBST(LOCALDAEAPI, $LOCALDAEAPI)
 AC_SUBST(A1oDAEAPI, $A1oDAEAPI)
 AC_SUBST(A2oDAEAPI, $A2oDAEAPI)
-AC_SUBST(A3oDAEAPI, $A3oDAEAPI)
 AC_SUBST(LOCALA1oDAEAPI, $LOCALA1oDAEAPI)
 AC_SUBST(LOCALA2oDAEAPI, $LOCALA2oDAEAPI)
-AC_SUBST(LOCALA3oDAEAPI, $LOCALA3oDAEAPI)
 AC_SUBST(CONTRIBS, $CONTRIBS)
-AC_SUBST(LOCALCONTRIBS, $LOCALCONTRIBS)
-AC_SUBST(OPTO, $OPTO)
-AC_SUBST(LOCALOPTO, $LOCALOPTO)
 AC_SUBST(DOCUMENTATION, $DOCUMENTATION)
 AC_SUBST(THEVERSION, $THEVERSION)
-AC_SUBST(MAPPTESTDATABASE, $MAPPTESTDATABASE)
-AC_SUBST(VAPP, $VAPP)
 AC_SUBST(MAPPTOP, `pwd`)
 
 dnl read <each file below>.in and write <each file below>
-AC_OUTPUT(Makefile setuppaths_MAPP.m start_MAPP.m Generate_help.sh help/help_MAPP.txt)
+AC_OUTPUT(Makefile setuppaths_MAPP.m start_MAPP.m)
 
 echo "--------------------------------------------------------------------"
 echo "$THEVERSION configured."

@@ -7,6 +7,8 @@ basedir='@MAPPLOCALLINKSDIR@';
 global MAPPbasedir;
 MAPPbasedir=basedir;
 currentwd = pwd();
+steamwd = strcat(currentwd, '/STEAM');
+ppiwd = strcat(currentwd, '/STEAM/polynomial-interpolation');
 cd(basedir);
 more off; % changed by JR 2013/09/26 more on;
 
@@ -17,6 +19,10 @@ fprintf(2,'- git version @MAPPVERSION@\n');
 fprintf(2,'- installed under:\n');
 fprintf(2,'  %s.\n\n', basedir);
 setuppaths_MAPP; % needs basedir
+cd(ppiwd);
+setupPPIPaths;
+cd(steamwd);
+setupSTEAMPaths;
 cd(currentwd);
 fprintf(2,'MAPP paths have been set up.\n');
 fprintf(2,'--------------------------------------------------------------------------------\n\n');
