@@ -23,10 +23,7 @@ A1oDAEAPI=@A1oDAEAPI@
 LOCALA1oDAEAPI=@LOCALA1oDAEAPI@
 A2oDAEAPI=@A2oDAEAPI@
 LOCALA2oDAEAPI=@LOCALA2oDAEAPI@
-A3oDAEAPI=@A3oDAEAPI@
-LOCALA3oDAEAPI=@LOCALA3oDAEAPI@
 DOCUMENTATION=@DOCUMENTATION@
-VAPP=@VAPP@
 TMPDIR=/var/tmp
 SHELL=/bin/bash
 
@@ -202,36 +199,6 @@ $(MAPPTOP)/locallinks-are-current: $(MAPPLOCALLINKSDIR)
 				fi; \
         done\
 	  fi
-	@-if [ "$(A3oDAEAPI)" != "" ]; then \
-		if [ ! -e $(MAPPLOCALLINKSDIR)/$(A3oDAEAPI) ]; then \
-			mkdir -p $(MAPPLOCALLINKSDIR)/$(A3oDAEAPI); \
-	    fi; \
-	    cd $(MAPPLOCALLINKSDIR)/$(A3oDAEAPI); \
-		if [ -e $(MAPPTOP)/$(LOCALA3oDAEAPI)/../0-README ]; then ln -s $(MAPPTOP)/$(LOCALA3oDAEAPI)/../0-README .; fi; \
-		if [ -e $(MAPPTOP)/$(LOCALA3oDAEAPI)/../00-VERSION ]; then ln -s $(MAPPTOP)/$(LOCALA3oDAEAPI)/../00-VERSION .; fi; \
-		for i in `(cd $(MAPPTOP)/$(LOCALA3oDAEAPI); find . -type d )`; do \
-				cd $(MAPPTOP)/$(LOCALA3oDAEAPI)/$$i; DOTMFILES=`echo *.m`; \
-				if [ "$$DOTMFILES" != '*.m' ]; then \
-					cd $(MAPPLOCALLINKSDIR)/$(A3oDAEAPI)/; \
-					ln -s $(MAPPTOP)/$(LOCALA3oDAEAPI)/$$i/*.m .; \
-				fi; \
-				cd $(MAPPTOP)/$(LOCALA3oDAEAPI)/$$i; DOTMFILES=`echo *.mat`; \
-				if [ "$$DOTMFILES" != '*.mat' ]; then \
-					cd $(MAPPLOCALLINKSDIR)/$(A3oDAEAPI)/; \
-					ln -s $(MAPPTOP)/$(LOCALA3oDAEAPI)/$$i/*.mat .; \
-				fi; \
-				cd $(MAPPTOP)/$(LOCALA3oDAEAPI)/$$i; DOTMFILES=`echo *.jpg`; \
-				if [ "$$DOTMFILES" != '*.jpg' ]; then \
-					cd $(MAPPLOCALLINKSDIR)/$(A3oDAEAPI)/; \
-					ln -s $(MAPPTOP)/$(LOCALA3oDAEAPI)/$$i/*.jpg .; \
-				fi; \
-				cd $(MAPPTOP)/$(LOCALA3oDAEAPI)/$$i; DOTMFILES=`echo *.png`; \
-				if [ "$$DOTMFILES" != '*.png' ]; then \
-					cd $(MAPPLOCALLINKSDIR)/$(A3oDAEAPI)/; \
-					ln -s $(MAPPTOP)/$(LOCALA3oDAEAPI)/$$i/*.png .; \
-				fi; \
-        done\
-	  fi
 	@-for i in `(cd $(MAPPTOP)/$(UTILS); find . -type d )`; do \
 				mkdir -p $(MAPPLOCALLINKSDIR)/$(UTILS); \
 				cd $(MAPPTOP)/$(UTILS)/$$i; DOTMFILES=`echo *.m`; \
@@ -240,89 +207,8 @@ $(MAPPTOP)/locallinks-are-current: $(MAPPLOCALLINKSDIR)
 					ln -s $(MAPPTOP)/$(UTILS)/$$i/*.m .; \
 				fi; \
         	done
-	@-if [ "$(OPTO)" != "" ]; then \
-		if [ ! -e $(MAPPLOCALLINKSDIR)/$(OPTO) ]; then \
-			mkdir -p $(MAPPLOCALLINKSDIR)/$(OPTO); \
-	    fi; \
-		for i in `(cd $(MAPPTOP)/$(LOCALOPTO); find . -type d)`; do \
-				cd $(MAPPTOP)/$(LOCALOPTO)/$$i; DOTMFILES=`echo *.m`; \
-				if [ "$$DOTMFILES" != '*.m' ]; then \
-					cd $(MAPPLOCALLINKSDIR)/$(OPTO)/; \
-					ln -s $(MAPPTOP)/$(LOCALOPTO)/$$i/*.m .; \
-				fi; \
-				cd $(MAPPTOP)/$(LOCALOPTO)/$$i; DOTMFILES=`echo *.mat`; \
-				if [ "$$DOTMFILES" != '*.mat' ]; then \
-					cd $(MAPPLOCALLINKSDIR)/$(OPTO)/; \
-					ln -s $(MAPPTOP)/$(LOCALOPTO)/$$i/*.mat .; \
-				fi; \
-				cd $(MAPPTOP)/$(LOCALOPTO)/$$i; DOTMFILES=`echo *.jpg`; \
-				if [ "$$DOTMFILES" != '*.jpg' ]; then \
-					cd $(MAPPLOCALLINKSDIR)/$(OPTO)/; \
-					ln -s $(MAPPTOP)/$(LOCALOPTO)/$$i/*.jpg .; \
-				fi; \
-				cd $(MAPPTOP)/$(LOCALOPTO)/$$i; DOTMFILES=`echo *.png`; \
-				if [ "$$DOTMFILES" != '*.png' ]; then \
-					cd $(MAPPLOCALLINKSDIR)/$(OPTO)/; \
-					ln -s $(MAPPTOP)/$(LOCALOPTO)/$$i/*.png .; \
-				fi; \
-        done\
-	  fi
-	@-if [ "$(VAPP)" != "" ]; then \
-		if [ ! -e $(MAPPLOCALLINKSDIR)/$(VAPP) ]; then \
-			mkdir -p $(MAPPLOCALLINKSDIR)/$(VAPP); \
-	    fi; \
-	    cd $(MAPPLOCALLINKSDIR)/$(VAPP); \
-		if [ -e $(MAPPTOP)/$(VAPP)/00-README ]; then ln -s $(MAPPTOP)/$(VAPP)/../0-README .; fi; \
-		if [ -e $(MAPPTOP)/$(VAPP)/va2modspec.m ]; then ln -s $(MAPPTOP)/$(VAPP)/va2modspec.m .; fi; \
-		if [ -e $(MAPPTOP)/$(VAPP)/start_VAPP.m ]; then ln -s $(MAPPTOP)/$(VAPP)/start_VAPP.m .; fi; \
-		if [ -e $(MAPPTOP)/$(VAPP)/frontend ]; then mkdir frontend; fi; \
-		if [ -e $(MAPPTOP)/$(VAPP)/backend ]; then mkdir backend; fi; \
-		if [ -e $(MAPPTOP)/$(VAPP)/doc ]; then mkdir doc; fi; \
-		#if [ -e $(MAPPTOP)/$(VAPP)/reference_models ]; then mkdir reference_models; fi; \
-		for i in `(cd $(MAPPTOP)/$(VAPP)/backend; find . -type d )`; do \
-				mkdir -p $(MAPPLOCALLINKSDIR)/$(VAPP)/backend/$$i; \
-				cd $(MAPPTOP)/$(VAPP)/backend/$$i; DOTMFILES=`echo *.*`; \
-				if [ "$$DOTMFILES" != '*.*' ]; then \
-					cd $(MAPPLOCALLINKSDIR)/$(VAPP)/backend/$$i; \
-					ln -s $(MAPPTOP)/$(VAPP)/backend/$$i/*.* .; \
-				fi; \
-        	done;\
-		for i in `(cd $(MAPPTOP)/$(VAPP)/frontend; find . -type d )`; do \
-				mkdir -p $(MAPPLOCALLINKSDIR)/$(VAPP)/frontend/$$i; \
-				cd $(MAPPTOP)/$(VAPP)/frontend/$$i; DOTMFILES=`echo *.*`; \
-				if [ "$$DOTMFILES" != '*.*' ]; then \
-					cd $(MAPPLOCALLINKSDIR)/$(VAPP)/frontend/$$i; \
-					ln -s $(MAPPTOP)/$(VAPP)/frontend/$$i/*.* .; \
-				fi; \
-        	done;\
-		#for i in `(cd $(MAPPTOP)/$(VAPP)/reference_models; find . -type d )`; do \
-		#		mkdir -p $(MAPPLOCALLINKSDIR)/$(VAPP)/reference_models/$$i; \
-		#		cd $(MAPPTOP)/$(VAPP)/reference_models/$$i; DOTMFILES=`echo *.va`; \
-		#		if [ "$$DOTMFILES" != '*.va' ]; then \
-		#			cd $(MAPPLOCALLINKSDIR)/$(VAPP)/reference_models/$$i; \
-		#			ln -s $(MAPPTOP)/$(VAPP)/reference_models/$$i/*.va .; \
-		#		fi; \
-		#		cd $(MAPPTOP)/$(VAPP)/reference_models/$$i; DOTMFILES=`echo *.vams`; \
-		#		if [ "$$DOTMFILES" != '*.vams' ]; then \
-		#			cd $(MAPPLOCALLINKSDIR)/$(VAPP)/reference_models/$$i; \
-		#			ln -s $(MAPPTOP)/$(VAPP)/reference_models/$$i/*.vams .; \
-		#		fi; \
-		#		cd $(MAPPTOP)/$(VAPP)/reference_models/$$i; DOTMFILES=`echo *.h`; \
-		#		if [ "$$DOTMFILES" != '*.h' ]; then \
-		#			cd $(MAPPLOCALLINKSDIR)/$(VAPP)/reference_models/$$i; \
-		#			ln -s $(MAPPTOP)/$(VAPP)/reference_models/$$i/*.h .; \
-		#		fi; \
-        	#done;\
-		cd $(MAPPTOP)/$(VAPP)/doc; DOTMFILES=`echo *.m`; \
-				if [ "$$DOTMFILES" != '*.m' ]; then \
-					cd $(MAPPLOCALLINKSDIR)/$(VAPP)/doc; \
-					ln -s $(MAPPTOP)/$(VAPP)/doc/*.m .; \
-				fi; \
-	  fi
 	@-if [ !  -e $(MAPPLOCALLINKSDIR)/$(DOCUMENTATION) ]; then mkdir -p $(MAPPLOCALLINKSDIR)/$(DOCUMENTATION); fi
 	@-cd $(MAPPLOCALLINKSDIR)/..;
-	@-chmod u+x Generate_help.sh
-	@-./Generate_help.sh
 	@-cp setuppaths_MAPP.m start_MAPP.m $(MAPPLOCALLINKSDIR)
 	@-#ln -s $(MAPPLOCALLINKSDIR)/start_MAPP.m $(MAPPLOCALLINKSDIR)/startup_MAPP.m 
 	@-ln -s $(MAPPLOCALLINKSDIR) MAPP-locallinks-installation
@@ -411,7 +297,7 @@ releasesnapshot: $(MAPPTOP)/locallinks-are-current
 
 
 autoclean: 
-	@rm -fr ./configure config.status autom4te.cache config.log ./Makefile ./start_MAPP.m startup_MAPP.m ./setuppaths_MAPP.m ./Generate_help.sh ./help/help_MAPP.txt ./help/help_MAPP.txt.in
+	@rm -fr ./configure config.status autom4te.cache config.log ./Makefile ./start_MAPP.m startup_MAPP.m ./setuppaths_MAPP.m ./help/help_MAPP.txt.in
 	@-rm -f $(MAPPTOP)/$(LOCALA1oDAEAPI)/test-scripts/MAPPtest/MAPPtest.m
 
 cleaneverything: clean autoclean
