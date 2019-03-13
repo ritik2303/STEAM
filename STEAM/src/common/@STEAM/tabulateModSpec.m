@@ -56,9 +56,8 @@ function tabulateModSpec(oMOD, iMOD, i_method, d_method, d_order, d_bounds, ...
 %   Interpolation methods that are currently supported are: SPLINE, COSINES
 %               
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-    data_dir = ...
-        '/home/ag/0_Unison/2_Academic/Spring2016/2_EE_290A_Numerical_Modelling_2/2_Project_Ideas/table_lookup_data/';
+    global MAPPbasedir;
+    data_dir = [MAPPbasedir, '/data_tables/'];
     defaultDiscretizationStep = 0.05;
     %checkInputModSpecSanity = check_ModSpec(iMOD);
     checkInputModSpecSanity = 1;
